@@ -1,13 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { CreateDateColumn } from 'typeorm/browser';
+import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
 
 export enum UserRole {
   USER = 'user',
@@ -34,14 +27,14 @@ export class UserEntity {
   @Column({ type: 'boolean', default: false, name: 'is_email_verified' })
   isEmailVerified: boolean;
 
-  @CreateDateColumn({
+  @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
     name: 'created_at',
   })
   createdAt: Date;
 
-  @UpdateDateColumn({
+  @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
