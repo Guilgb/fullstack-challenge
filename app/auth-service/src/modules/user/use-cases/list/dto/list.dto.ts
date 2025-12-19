@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '@shared/modules/database/entities/user.entity';
+import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
 
 export enum OrderDirection {
@@ -23,6 +24,7 @@ export class ListUsersQueryDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number)
   @IsInt({ message: 'Página deve ser um número inteiro' })
   @Min(1, { message: 'Página deve ser no mínimo 1' })
   page?: number = 1;
@@ -33,6 +35,7 @@ export class ListUsersQueryDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number)
   @IsInt({ message: 'Tamanho da página deve ser um número inteiro' })
   @Min(1, { message: 'Tamanho da página deve ser no mínimo 1' })
   @Max(100, { message: 'Tamanho da página não pode ultrapassar 100' })
