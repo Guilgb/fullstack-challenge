@@ -5,6 +5,7 @@ import { WinstonModule } from '@shared/modules/winston/winston.module';
 import { UserRepositoryInterface } from './interfaces/user.repository.interface';
 import { UserRepository } from './repositories/user.repository';
 import { CreateUserUseCase } from './use-cases/create/create.use-case';
+import { ListUsersUseCase } from './use-cases/list/list.use-case';
 import { UpdateUserUseCase } from './use-cases/update/update.use-case';
 import { UserController } from './user.controller';
 
@@ -14,6 +15,7 @@ import { UserController } from './user.controller';
   providers: [
     CreateUserUseCase,
     UpdateUserUseCase,
+    ListUsersUseCase,
     { provide: UserRepositoryInterface, useClass: UserRepository },
   ],
   exports: [UserRepositoryInterface],

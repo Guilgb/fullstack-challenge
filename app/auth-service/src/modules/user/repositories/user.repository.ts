@@ -2,9 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '@shared/modules/database/entities/user.entity';
 import { Repository } from 'typeorm';
-import { UserRepositoryInterface } from '../interfaces/user.repository.interface';
-import { UpdateUserDto } from '../use-cases/update/dto/user.update.dto';
+import {
+  PaginatedResult,
+  PaginationOptions,
+  UserRepositoryInterface,
+} from '../interfaces/user.repository.interface';
 import { CreateUserDto } from '../use-cases/create/dto/user.create.dto';
+import { UpdateUserDto } from '../use-cases/update/dto/user.update.dto';
 
 @Injectable()
 export class UserRepository implements UserRepositoryInterface {
@@ -31,6 +35,53 @@ export class UserRepository implements UserRepositoryInterface {
 
   async findAll(): Promise<UserEntity[]> {
     return this.userRepository.find();
+  }
+
+  async findAllPaginated(
+    options: PaginationOptions,
+  ): Promise<PaginatedResult<UserEntity>> {
+    const {
+      page,
+      pageSize,
+      orderBy = 'createdAt',
+      orderDirection = 'DESC',
+    } = options;
+
+    const validPage = Math.max(1, page);
+    const validPageSize = Math.min(Math.max(1, pageSize), 100);
+
+    const skip = (validPage - 1) * validPageSize;
+
+    const validOrderByFields = [
+      'email',
+      'username',
+      'createdAt',
+      'updatedAt',
+      'role',
+      'isEmailVerified',
+    ];
+
+    const safeOrderBy = validOrderByFields.includes(orderBy)
+      ? orderBy
+      : 'createdAt';
+
+    const [data, total] = await this.userRepository.findAndCount({
+      skip,
+      take: validPageSize,
+      order: {
+        [safeOrderBy]: orderDirection,
+      },
+    });
+
+    const totalPages = Math.ceil(total / validPageSize);
+
+    return {
+      data,
+      total,
+      page: validPage,
+      pageSize: validPageSize,
+      totalPages,
+    };
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
