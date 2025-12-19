@@ -1,3 +1,4 @@
+import { AuthModule } from '@modules/auth/auth.module';
 import { UserModule } from '@modules/user/user.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -15,6 +16,7 @@ import { WinstonModule } from '@shared/modules/winston/winston.module';
     WinstonModule,
     DatabaseModule,
     UserModule,
+    AuthModule,
   ],
   providers: [
     WinstonLoggerService,

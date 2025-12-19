@@ -42,6 +42,14 @@ export class UserEntity {
   })
   updatedAt: Date;
 
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+    name: 'deleted_at',
+    default: null,
+  })
+  deletedAt: Date | null;
+
   @BeforeInsert()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);
