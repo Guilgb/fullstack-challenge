@@ -29,6 +29,12 @@ export class LoginResponseDto {
   access_token: string;
 
   @ApiProperty({
+    description: 'Token para renovar o access token',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  })
+  refresh_token: string;
+
+  @ApiProperty({
     description: 'Tipo do token',
     example: 'Bearer',
   })

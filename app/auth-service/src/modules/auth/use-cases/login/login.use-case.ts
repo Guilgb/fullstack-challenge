@@ -4,6 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { WinstonLoggerService } from '@shared/modules/winston/winston-logger.service';
 import * as bcrypt from 'bcrypt';
+import { TokenService } from '../../services/token.service';
 import { LoginDto, LoginResponseDto } from './dto/login.dto';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class LoginUseCase {
   constructor(
     private readonly userRepository: UserRepositoryInterface,
     private readonly jwtService: JwtService,
+    private readonly tokenService: TokenService,
     private readonly logger: WinstonLoggerService,
   ) {}
 
@@ -44,6 +46,22 @@ export class LoginUseCase {
 
       const access_token = this.jwtService.sign(payload);
 
+      // Gerar refresh token (válido por 7 dias)
+      const refresh_token = this.jwtService.sign(payload, {
+        expiresIn: '7d',
+        secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret',
+      });
+
+      const refreshExpiresAt = new Date();
+      refreshExpiresAt.setDate(refreshExpiresAt.getDate() + 7);
+
+      // Armazenar refresh token
+      this.tokenService.storeRefreshToken(
+        user.id,
+        refresh_token,
+        refreshExpiresAt,
+      );
+
       const authUser: AuthUser = {
         id: user.id,
         email: user.email,
@@ -59,8 +77,9 @@ export class LoginUseCase {
 
       return {
         access_token,
+        refresh_token,
         token_type: 'Bearer',
-        expires_in: 88000,
+        expires_in: 3600,
         user: authUser,
       };
     } catch (error) {

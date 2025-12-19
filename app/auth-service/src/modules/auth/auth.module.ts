@@ -7,7 +7,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '@shared/modules/database/entities';
 import { WinstonModule } from '@shared/modules/winston/winston.module';
 import { AuthController } from './auth.controller';
+import { TokenService } from './services/token.service';
 import { LoginUseCase } from './use-cases/login/login.use-case';
+import { RefreshTokenUseCase } from './use-cases/refresh-token/refresh-token.use-case';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { LoginUseCase } from './use-cases/login/login.use-case';
   controllers: [AuthController],
   providers: [
     LoginUseCase,
+    RefreshTokenUseCase,
+    TokenService,
     { provide: UserRepositoryInterface, useClass: UserRepository },
   ],
   exports: [],
