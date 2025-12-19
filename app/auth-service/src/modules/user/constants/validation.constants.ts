@@ -23,12 +23,6 @@ export const VALIDATION_MESSAGES = {
     REQUIRED: 'Senha é obrigatória',
   },
 
-  ROLE: {
-    INVALID_UUID: 'Role ID deve ser um UUID válido',
-    REQUIRED: 'Role ID é obrigatório',
-    NOT_FOUND: 'Role não encontrada',
-  },
-
   GENERAL: {
     REQUIRED: 'Este campo é obrigatório',
     INVALID_STRING: 'Este campo deve ser uma string',
@@ -38,6 +32,11 @@ export const VALIDATION_MESSAGES = {
   USER: {
     ID_OR_EMAIL: {
       REQUIRED: 'ID ou email do usuário é obrigatório',
+      NOT_FOUND: 'Usuário não encontrado',
+    },
+
+    USERNAME: {
+      REQUIRED: 'Nome de usuário é obrigatório',
       NOT_FOUND: 'Usuário não encontrado',
     },
   },

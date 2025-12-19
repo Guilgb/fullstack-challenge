@@ -8,7 +8,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '@shared/modules/database/entities/user.entity';
 import {
   IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsString,
   Matches,
@@ -46,11 +45,12 @@ export class CreateUserDto {
   password: string;
 
   @ApiProperty({
-    description: 'Role do usuário',
-    example: SWAGGER_EXAMPLES.ROLES.USER,
+    description: 'Nome de usuário',
+    example: SWAGGER_EXAMPLES.USER.USERNAME,
   })
-  @IsEnum(UserRole, { message: VALIDATION_MESSAGES.ROLE.INVALID_UUID })
-  role: UserRole;
+  @IsString({ message: VALIDATION_MESSAGES.GENERAL.INVALID_STRING })
+  @IsNotEmpty({ message: VALIDATION_MESSAGES.USER.USERNAME.REQUIRED })
+  username: string;
 }
 
 export class CreatedUserResponseDto {
@@ -64,12 +64,14 @@ export class CreatedUserResponseDto {
     description: 'E-mail do usuário',
     example: SWAGGER_EXAMPLES.USER.EMAIL,
   })
+  @IsEmail()
   email: string;
 
   @ApiProperty({
     description: 'Nome de usuário',
     example: SWAGGER_EXAMPLES.USER.USERNAME,
   })
+  @IsString()
   username: string;
 
   @ApiProperty({

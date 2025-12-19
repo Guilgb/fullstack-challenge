@@ -53,7 +53,7 @@ export class UpdateUserDto {
     required: false,
   })
   @IsOptional()
-  @IsEnum(UserRole, { message: VALIDATION_MESSAGES.ROLE.INVALID_UUID })
+  @IsEnum(UserRole, { message: VALIDATION_MESSAGES.GENERAL.INTERNAL_ERROR })
   role?: UserRole;
 }
 

@@ -1,3 +1,4 @@
+import { UserRepositoryInterface } from '@modules/user/interfaces/user.repository.interface';
 import {
   BadRequestException,
   ConflictException,
@@ -6,7 +7,6 @@ import {
 import { WinstonLoggerService } from '@shared/modules/winston/winston-logger.service';
 import { randomUUID } from 'crypto';
 import { CreatedUserResponseDto, CreateUserDto } from './dto/user.create.dto';
-import { UserRepositoryInterface } from '@modules/user/interfaces/user.repository.interface';
 
 @Injectable()
 export class CreateUserUseCase {
@@ -28,7 +28,7 @@ export class CreateUserUseCase {
 
       const userId = randomUUID();
       const user = await this.userRepository.create(input, userId);
-
+      // todo gerar welcone token e enviar email de boas vindas
       this.logger.log(
         `Usuário criado com sucesso: ${user.id}`,
         'CreateUserUseCase',
