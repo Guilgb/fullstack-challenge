@@ -34,6 +34,13 @@ export const VALIDATION_MESSAGES = {
     INVALID_STRING: 'Este campo deve ser uma string',
     INTERNAL_ERROR: 'Erro interno do servidor',
   },
+
+  USER: {
+    ID_OR_EMAIL: {
+      REQUIRED: 'ID ou email do usuário é obrigatório',
+      NOT_FOUND: 'Usuário não encontrado',
+    },
+  },
 } as const;
 
 export const FIELD_LIMITS = {

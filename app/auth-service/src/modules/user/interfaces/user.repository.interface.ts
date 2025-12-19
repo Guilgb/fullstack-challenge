@@ -23,6 +23,7 @@ export abstract class UserRepositoryInterface {
     id: string,
   ): Promise<UserEntity>;
   abstract findById(id: string): Promise<UserEntity | null>;
+  abstract existsByIdOrEmail(idOrEmail: string): Promise<boolean>;
   abstract findByEmail(email: string): Promise<UserEntity | null>;
   abstract findAll(): Promise<UserEntity[]>;
   abstract findAllPaginated(

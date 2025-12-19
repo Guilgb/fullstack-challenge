@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -19,9 +18,9 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserRepositoryInterface } from './interfaces/user.repository.interface';
 import { CreateUserUseCase } from './use-cases/create/create.use-case';
 import { CreateUserDto } from './use-cases/create/dto/user.create.dto';
+import { DeleteUserUseCase } from './use-cases/delete/delete.use-case';
 import { ListUsersQueryDto } from './use-cases/list/dto/list.dto';
 import { ListUsersUseCase } from './use-cases/list/list.use-case';
 import { UpdateUserDto } from './use-cases/update/dto/user.update.dto';
@@ -34,7 +33,7 @@ export class UserController {
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly listUsersUseCase: ListUsersUseCase,
-    private readonly userRepository: UserRepositoryInterface,
+    private readonly deleteUserUseCase: DeleteUserUseCase,
   ) {}
 
   @Post()
@@ -129,7 +128,7 @@ export class UserController {
     return this.listUsersUseCase.execute(query);
   }
 
-  @Get(':id')
+  @Get(':idOrEmail')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Obter usuário por ID',
@@ -148,14 +147,7 @@ export class UserController {
     status: HttpStatus.NOT_FOUND,
     description: 'Usuário não encontrado',
   })
-  async findById(@Param('id') id: string) {
-    const user = await this.userRepository.findById(id);
-    if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
-    }
-    const { ...userWithoutPassword } = user;
-    return userWithoutPassword;
-  }
+  async findUser(@Param('idOrEmail') idOrEmail: string) {}
 
   @Patch(':id')
   @ApiBearerAuth()
@@ -184,7 +176,7 @@ export class UserController {
     return this.updateUserUseCase.execute(id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete(':idOrEmail')
   @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
@@ -205,9 +197,6 @@ export class UserController {
     description: 'Usuário não encontrado',
   })
   async delete(@Param('id') id: string) {
-    const deleted = await this.userRepository.delete(id);
-    if (!deleted) {
-      throw new NotFoundException('Usuário não encontrado');
-    }
+    return this.deleteUserUseCase.execute(id);
   }
 }

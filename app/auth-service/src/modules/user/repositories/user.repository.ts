@@ -25,6 +25,13 @@ export class UserRepository implements UserRepositoryInterface {
     return this.userRepository.save(user);
   }
 
+  async existsByIdOrEmail(idOrEmail: string): Promise<boolean> {
+    const count = await this.userRepository.count({
+      where: [{ id: idOrEmail }, { email: idOrEmail }],
+    });
+    return count > 0;
+  }
+
   async findById(id: string): Promise<UserEntity | null> {
     return this.userRepository.findOne({ where: { id } });
   }
