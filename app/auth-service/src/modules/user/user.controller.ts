@@ -21,6 +21,9 @@ import {
 import { CreateUserUseCase } from './use-cases/create/create.use-case';
 import { CreateUserDto } from './use-cases/create/dto/user.create.dto';
 import { DeleteUserUseCase } from './use-cases/delete/delete.use-case';
+import { DeleteUserInputDto } from './use-cases/delete/dto/delete.dto';
+import { GetUserInputDto } from './use-cases/get/dto/get.dto';
+import { GetUserUseCase } from './use-cases/get/get.use-case';
 import { ListUsersQueryDto } from './use-cases/list/dto/list.dto';
 import { ListUsersUseCase } from './use-cases/list/list.use-case';
 import { UpdateUserDto } from './use-cases/update/dto/user.update.dto';
@@ -34,6 +37,7 @@ export class UserController {
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly listUsersUseCase: ListUsersUseCase,
     private readonly deleteUserUseCase: DeleteUserUseCase,
+    private readonly getUserUseCase: GetUserUseCase,
   ) {}
 
   @Post()
@@ -65,8 +69,8 @@ export class UserController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Dados inválidos',
   })
-  async create(@Body() createUserDto: CreateUserDto) {
-    return this.createUserUseCase.execute(createUserDto);
+  async create(@Body() input: CreateUserDto) {
+    return this.createUserUseCase.execute(input);
   }
 
   @Get()
@@ -147,7 +151,9 @@ export class UserController {
     status: HttpStatus.NOT_FOUND,
     description: 'Usuário não encontrado',
   })
-  async findUser(@Param('idOrEmail') idOrEmail: string) {}
+  async findUser(@Body() input: GetUserInputDto) {
+    return this.getUserUseCase.execute(input);
+  }
 
   @Patch(':id')
   @ApiBearerAuth()
@@ -172,8 +178,8 @@ export class UserController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Dados inválidos',
   })
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.updateUserUseCase.execute(id, updateUserDto);
+  async update(@Param('id') id: string, @Body() input: UpdateUserDto) {
+    return this.updateUserUseCase.execute(id, input);
   }
 
   @Delete(':idOrEmail')
@@ -184,8 +190,8 @@ export class UserController {
     description: 'Remove um usuário do sistema',
   })
   @ApiParam({
-    name: 'id',
-    description: 'ID do usuário',
+    name: 'idOrEmail',
+    description: 'ID ou email do usuário',
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @ApiResponse({
@@ -196,7 +202,7 @@ export class UserController {
     status: HttpStatus.NOT_FOUND,
     description: 'Usuário não encontrado',
   })
-  async delete(@Param('id') id: string) {
-    return this.deleteUserUseCase.execute(id);
+  async delete(@Body() input: DeleteUserInputDto) {
+    return this.deleteUserUseCase.execute(input);
   }
 }

@@ -22,7 +22,7 @@ export abstract class UserRepositoryInterface {
     createUserDto: CreateUserDto,
     id: string,
   ): Promise<UserEntity>;
-  abstract findById(id: string): Promise<UserEntity | null>;
+  abstract findByIdOrEmail(idOrEmail: string): Promise<UserEntity | null>;
   abstract existsByIdOrEmail(idOrEmail: string): Promise<boolean>;
   abstract findByEmail(email: string): Promise<UserEntity | null>;
   abstract findAll(): Promise<UserEntity[]>;

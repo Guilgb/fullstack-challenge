@@ -32,8 +32,10 @@ export class UserRepository implements UserRepositoryInterface {
     return count > 0;
   }
 
-  async findById(id: string): Promise<UserEntity | null> {
-    return this.userRepository.findOne({ where: { id } });
+  async findByIdOrEmail(idOrEmail: string): Promise<UserEntity | null> {
+    return this.userRepository.findOne({
+      where: [{ id: idOrEmail }, { email: idOrEmail }],
+    });
   }
 
   async findByEmail(email: string): Promise<UserEntity | null> {
@@ -91,13 +93,16 @@ export class UserRepository implements UserRepositoryInterface {
     };
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
-    await this.userRepository.update(id, updateUserDto);
-    return this.findById(id);
+  async update(
+    idOrEmail: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserEntity> {
+    await this.userRepository.update(idOrEmail, updateUserDto);
+    return this.findByIdOrEmail(idOrEmail);
   }
 
-  async delete(id: string): Promise<boolean> {
-    const result = await this.userRepository.delete(id);
+  async delete(idOrEmail: string): Promise<boolean> {
+    const result = await this.userRepository.delete(idOrEmail);
     return result.affected > 0;
   }
 

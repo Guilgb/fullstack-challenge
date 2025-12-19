@@ -19,7 +19,7 @@ export class UpdateUserUseCase {
     input: UpdateUserDto,
   ): Promise<UpdatedUserResponseDto> {
     try {
-      const user = await this.userRepository.findById(userId);
+      const user = await this.userRepository.findByIdOrEmail(userId);
       if (!user) {
         this.logger.warn(
           `Tentativa de atualizar usuário inexistente: ${userId}`,

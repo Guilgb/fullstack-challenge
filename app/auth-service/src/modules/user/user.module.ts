@@ -6,6 +6,7 @@ import { UserRepositoryInterface } from './interfaces/user.repository.interface'
 import { UserRepository } from './repositories/user.repository';
 import { CreateUserUseCase } from './use-cases/create/create.use-case';
 import { DeleteUserUseCase } from './use-cases/delete/delete.use-case';
+import { GetUserUseCase } from './use-cases/get/get.use-case';
 import { ListUsersUseCase } from './use-cases/list/list.use-case';
 import { UpdateUserUseCase } from './use-cases/update/update.use-case';
 import { UserController } from './user.controller';
@@ -18,6 +19,7 @@ import { UserController } from './user.controller';
     UpdateUserUseCase,
     ListUsersUseCase,
     DeleteUserUseCase,
+    GetUserUseCase,
     { provide: UserRepositoryInterface, useClass: UserRepository },
   ],
   exports: [UserRepositoryInterface],
