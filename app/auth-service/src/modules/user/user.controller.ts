@@ -22,7 +22,7 @@ import { CreateUserUseCase } from './use-cases/create/create.use-case';
 import { CreateUserDto } from './use-cases/create/dto/user.create.dto';
 import { DeleteUserUseCase } from './use-cases/delete/delete.use-case';
 import { DeleteUserInputDto } from './use-cases/delete/dto/delete.dto';
-import { GetUserInputDto } from './use-cases/get/dto/get.dto';
+import { GetUserParamDto } from './use-cases/get/dto/get.dto';
 import { GetUserUseCase } from './use-cases/get/get.use-case';
 import { ListUsersQueryDto } from './use-cases/list/dto/list.dto';
 import { ListUsersUseCase } from './use-cases/list/list.use-case';
@@ -73,7 +73,7 @@ export class UserController {
     return this.createUserUseCase.execute(input);
   }
 
-  @Get()
+  @Get('list')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Listar usuários com paginação',
@@ -135,12 +135,12 @@ export class UserController {
   @Get(':idOrEmail')
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Obter usuário por ID',
+    summary: 'Obter usuário por ID ou email',
     description: 'Retorna os detalhes de um usuário específico',
   })
   @ApiParam({
-    name: 'id',
-    description: 'ID do usuário',
+    name: 'idOrEmail',
+    description: 'ID ou email do usuário',
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @ApiResponse({
@@ -151,7 +151,7 @@ export class UserController {
     status: HttpStatus.NOT_FOUND,
     description: 'Usuário não encontrado',
   })
-  async findUser(@Body() input: GetUserInputDto) {
+  async findUser(@Param() input: GetUserParamDto) {
     return this.getUserUseCase.execute(input);
   }
 
