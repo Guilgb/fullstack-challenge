@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { WinstonLoggerService } from '@shared/modules/winston/winston-logger.service';
-import { DeleteUserInputDto } from './dto/delete.dto';
+import { DeleteUserParamDto } from './dto/delete.dto';
 
 @Injectable()
 export class DeleteUserUseCase {
@@ -13,7 +13,7 @@ export class DeleteUserUseCase {
     private readonly userRepository: UserRepositoryInterface,
     private readonly logger: WinstonLoggerService,
   ) {}
-  async execute(userIdOrEmail: DeleteUserInputDto): Promise<void> {
+  async execute(userIdOrEmail: DeleteUserParamDto): Promise<void> {
     try {
       const userExists = await this.userRepository.existsByIdOrEmail(
         userIdOrEmail.idOrEmail,

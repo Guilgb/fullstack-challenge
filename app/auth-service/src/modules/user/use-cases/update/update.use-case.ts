@@ -5,7 +5,11 @@ import {
 } from '@nestjs/common';
 import { WinstonLoggerService } from '@shared/modules/winston/winston-logger.service';
 import { UserRepositoryInterface } from '../../interfaces/user.repository.interface';
-import { UpdatedUserResponseDto, UpdateUserDto } from './dto/user.update.dto';
+import {
+  UpdatedUserResponseDto,
+  UpdateUserDto,
+  UpdateUserParamDto,
+} from './dto/user.update.dto';
 
 @Injectable()
 export class UpdateUserUseCase {
@@ -15,36 +19,30 @@ export class UpdateUserUseCase {
   ) {}
 
   async execute(
-    userId: string,
+    userIdOrEmail: UpdateUserParamDto,
     input: UpdateUserDto,
   ): Promise<UpdatedUserResponseDto> {
     try {
-      const user = await this.userRepository.findByIdOrEmail(userId);
+      const user = await this.userRepository.findByIdOrEmail(
+        userIdOrEmail.idOrEmail,
+      );
       if (!user) {
         this.logger.warn(
-          `Tentativa de atualizar usuário inexistente: ${userId}`,
+          `Tentativa de atualizar usuário inexistente: ${userIdOrEmail.idOrEmail}`,
           'UpdateUserUseCase',
         );
         throw new NotFoundException('Usuário não encontrado');
       }
 
-      if (input.email && input.email !== user.email) {
-        const existingUser = await this.userRepository.findByEmail(input.email);
-        if (existingUser) {
-          this.logger.warn(
-            `Tentativa de atualizar para email já existente: ${input.email}`,
-            'UpdateUserUseCase',
-          );
-          throw new BadRequestException('Email já está em uso');
-        }
-      }
-
-      const updatedUser = await this.userRepository.update(userId, input);
+      const updatedUser = await this.userRepository.update(
+        userIdOrEmail.idOrEmail,
+        input,
+      );
 
       this.logger.log(
-        `Usuário atualizado com sucesso: ${userId}`,
+        `Usuário atualizado com sucesso: ${userIdOrEmail.idOrEmail}`,
         'UpdateUserUseCase',
-        { userId, email: updatedUser.email },
+        { userIdOrEmail: userIdOrEmail.idOrEmail, email: updatedUser.email },
       );
 
       return {
@@ -68,7 +66,7 @@ export class UpdateUserUseCase {
         `Erro ao atualizar usuário: ${error.message}`,
         error.stack,
         'UpdateUserUseCase',
-        { userId, errorCode: error.code },
+        { userIdOrEmail: userIdOrEmail.idOrEmail, errorCode: error.code },
       );
 
       throw new BadRequestException('Falha ao atualizar usuário');

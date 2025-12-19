@@ -21,12 +21,15 @@ import {
 import { CreateUserUseCase } from './use-cases/create/create.use-case';
 import { CreateUserDto } from './use-cases/create/dto/user.create.dto';
 import { DeleteUserUseCase } from './use-cases/delete/delete.use-case';
-import { DeleteUserInputDto } from './use-cases/delete/dto/delete.dto';
+import { DeleteUserParamDto } from './use-cases/delete/dto/delete.dto';
 import { GetUserParamDto } from './use-cases/get/dto/get.dto';
 import { GetUserUseCase } from './use-cases/get/get.use-case';
 import { ListUsersQueryDto } from './use-cases/list/dto/list.dto';
 import { ListUsersUseCase } from './use-cases/list/list.use-case';
-import { UpdateUserDto } from './use-cases/update/dto/user.update.dto';
+import {
+  UpdateUserDto,
+  UpdateUserParamDto,
+} from './use-cases/update/dto/user.update.dto';
 import { UpdateUserUseCase } from './use-cases/update/update.use-case';
 
 @ApiTags('Usuários')
@@ -155,16 +158,11 @@ export class UserController {
     return this.getUserUseCase.execute(input);
   }
 
-  @Patch(':id')
+  @Patch(':idOrEmail')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Atualizar usuário',
     description: 'Atualiza os dados de um usuário existente',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'ID do usuário',
-    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -178,8 +176,11 @@ export class UserController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Dados inválidos',
   })
-  async update(@Param('id') id: string, @Body() input: UpdateUserDto) {
-    return this.updateUserUseCase.execute(id, input);
+  async update(
+    @Param() param: UpdateUserParamDto,
+    @Body() input: UpdateUserDto,
+  ) {
+    return this.updateUserUseCase.execute(param, input);
   }
 
   @Delete(':idOrEmail')
@@ -189,11 +190,6 @@ export class UserController {
     summary: 'Deletar usuário',
     description: 'Remove um usuário do sistema',
   })
-  @ApiParam({
-    name: 'idOrEmail',
-    description: 'ID ou email do usuário',
-    example: '550e8400-e29b-41d4-a716-446655440000',
-  })
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: 'Usuário deletado com sucesso',
@@ -202,7 +198,7 @@ export class UserController {
     status: HttpStatus.NOT_FOUND,
     description: 'Usuário não encontrado',
   })
-  async delete(@Body() input: DeleteUserInputDto) {
+  async delete(@Param() input: DeleteUserParamDto) {
     return this.deleteUserUseCase.execute(input);
   }
 }

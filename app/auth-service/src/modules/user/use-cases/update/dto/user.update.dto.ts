@@ -9,6 +9,7 @@ import { UserRole } from '@shared/modules/database/entities/user.entity';
 import {
   IsEmail,
   IsEnum,
+  IsNotEmpty,
   IsOptional,
   IsString,
   Matches,
@@ -16,6 +17,15 @@ import {
   MinLength,
 } from 'class-validator';
 
+export class UpdateUserParamDto {
+  @ApiProperty({
+    description: 'ID ou email do usuário a ser atualizado',
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  })
+  @IsString({ message: 'O ID do usuário deve ser uma string válida.' })
+  @IsNotEmpty({ message: 'O ID ou email do usuário é obrigatório.' })
+  idOrEmail: string;
+}
 export class UpdateUserDto {
   @ApiProperty({
     description: 'E-mail do usuário',

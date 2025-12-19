@@ -97,12 +97,30 @@ export class UserRepository implements UserRepositoryInterface {
     idOrEmail: string,
     updateUserDto: UpdateUserDto,
   ): Promise<UserEntity> {
-    await this.userRepository.update(idOrEmail, updateUserDto);
+    const isUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        idOrEmail,
+      );
+
+    if (isUuid) {
+      await this.userRepository.update(idOrEmail, updateUserDto);
+    } else {
+      await this.userRepository.update({ email: idOrEmail }, updateUserDto);
+    }
+
     return this.findByIdOrEmail(idOrEmail);
   }
 
   async delete(idOrEmail: string): Promise<boolean> {
-    const result = await this.userRepository.delete(idOrEmail);
+    const isUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        idOrEmail,
+      );
+
+    const result = isUuid
+      ? await this.userRepository.delete(idOrEmail)
+      : await this.userRepository.delete({ email: idOrEmail });
+
     return result.affected > 0;
   }
 

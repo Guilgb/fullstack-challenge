@@ -30,9 +30,9 @@ export abstract class UserRepositoryInterface {
     options: PaginationOptions,
   ): Promise<PaginatedResult<UserEntity>>;
   abstract update(
-    id: string,
+    idOrEmail: string,
     updateUserDto: UpdateUserDto,
   ): Promise<UserEntity>;
-  abstract delete(id: string): Promise<boolean>;
+  abstract delete(idOrEmail: string): Promise<boolean>;
   abstract existsByEmail(email: string): Promise<boolean>;
 }

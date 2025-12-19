@@ -5,7 +5,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class DeleteUserInputDto {
+export class DeleteUserParamDto {
   @ApiProperty({
     description: 'ID ou email do usuário a ser deletado',
     example: SWAGGER_EXAMPLES.USER.ID,
