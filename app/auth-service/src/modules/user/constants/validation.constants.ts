@@ -59,9 +59,8 @@ export const FIELD_LIMITS = {
 export const SWAGGER_EXAMPLES = {
   USER: {
     ID: '550e8400-e29b-41d4-a716-446655440000',
-    EMAIL: 'produtor@saborraiz.com',
+    EMAIL: 'fulano@email.com',
     PASSWORD: 'MinhaSenh@123',
-    AVATAR_URL: 'https://example.com/avatar.jpg',
     USERNAME: 'Fulano de Tal',
   },
   DATES: {
