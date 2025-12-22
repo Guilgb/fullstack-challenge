@@ -17,6 +17,7 @@ import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -24,6 +25,8 @@ import { UserRole } from '../../auth/enums/roles.enum';
 import { AuthenticatedUser } from '../../auth/interfaces/auth.interface';
 import { ProxyService } from '../../proxy/services/proxy.service';
 import { CreateUserDto } from '../dto/create-user.dto';
+import { GetUserParamDto } from '../dto/get-user.dto';
+import { ListUsersQueryDto } from '../dto/list-user.dto';
 import { PaginationDto } from '../dto/pagination.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 
@@ -35,44 +38,59 @@ export class UserGatewayController {
 
   @Get()
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Listar todos os usuários (Apenas Admin)' })
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Listar usuários com paginação',
+    description: 'Retorna uma lista paginada de usuários cadastrados',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Número da página (padrão: 1)',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    type: Number,
+    description: 'Quantidade de itens por página (padrão: 10, máximo: 100)',
+    example: 10,
+  })
+  @ApiQuery({
+    name: 'orderBy',
+    required: false,
+    description: 'Campo para ordenação',
+    example: 'createdAt',
+  })
+  @ApiQuery({
+    name: 'orderDirection',
+    required: false,
+    description: 'Direção da ordenação (ASC ou DESC)',
+    example: 'DESC',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Lista de usuários recuperada com sucesso',
+    description: 'Lista paginada de usuários retornada com sucesso',
     schema: {
-      properties: {
-        data: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              id: { type: 'string' },
-              email: { type: 'string' },
-              name: { type: 'string' },
-              role: { type: 'string' },
-              createdAt: { type: 'string' },
-            },
+      example: {
+        users: [
+          {
+            id: '550e8400-e29b-41d4-a716-446655440000',
+            email: 'user@example.com',
+            username: 'john_doe',
+            role: 'user',
+            isEmailVerified: false,
+            createdAt: '2025-12-19T13:50:00.000Z',
+            updatedAt: '2025-12-19T13:50:00.000Z',
           },
-        },
-        meta: {
-          type: 'object',
-          properties: {
-            total: { type: 'number' },
-            page: { type: 'number' },
-            limit: { type: 'number' },
-            totalPages: { type: 'number' },
-          },
-        },
+        ],
+        page: 1,
+        pageSize: 10,
+        total: 25,
+        totalPages: 3,
       },
     },
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Não autorizado',
-  })
-  @ApiResponse({
-    status: HttpStatus.FORBIDDEN,
-    description: 'Proibido - Apenas Admin',
   })
   async findAll(@Query() paginationDto: PaginationDto) {
     return this.proxyService.sendToAuthService('user.list', paginationDto);
@@ -82,25 +100,41 @@ export class UserGatewayController {
   @ApiOperation({ summary: 'Pega o perfil do usuário atual' })
   @ApiResponse({ status: 200, description: 'Perfil do usuário recuperado' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
-  async getProfile(@CurrentUser() user: AuthenticatedUser) {
-    return this.proxyService.sendToAuthService('user.get', { id: user.sub });
+  async getProfile(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() query: ListUsersQueryDto,
+  ) {
+    return this.proxyService.sendToAuthService(
+      'user.get',
+      { id: user.sub },
+      query,
+    );
   }
 
   @Get(':idOrEmail')
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Obter usuário por ID (Apenas Admin)' })
-  @ApiParam({ name: 'idOrEmail', description: 'UUID ou email do usuário' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Usuário encontrado' })
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Obter usuário por ID ou email',
+    description: 'Retorna os detalhes de um usuário específico',
+  })
+  @ApiParam({
+    name: 'idOrEmail',
+    description: 'ID ou email do usuário',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Usuário encontrado',
+  })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Usuário não encontrado',
   })
-  @ApiResponse({
-    status: HttpStatus.FORBIDDEN,
-    description: 'Proibido - Apenas Admin',
-  })
-  async findOne(@Param('idOrEmail') idOrEmail: string) {
-    return this.proxyService.sendToAuthService('user.get', { idOrEmail });
+  async findOne(@Param() params: GetUserParamDto) {
+    return this.proxyService.sendToAuthService('user.get', {
+      idOrEmail: params.idOrEmail,
+    });
   }
 
   @Post()
@@ -152,15 +186,15 @@ export class UserGatewayController {
   ) {
     return this.proxyService.sendToAuthService('user.update', {
       id: user.sub,
-      name: updateUserDto.name,
+      username: updateUserDto.username,
       email: updateUserDto.email,
       password: updateUserDto.password,
     });
   }
 
   @Put(':idOrEmail')
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Atualizar usuário por ID (Apenas Admin)' })
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @ApiOperation({ summary: 'Atualizar usuário por ID ou email' })
   @ApiParam({ name: 'idOrEmail', description: 'UUID ou email do usuário' })
   @ApiResponse({
     status: HttpStatus.OK,

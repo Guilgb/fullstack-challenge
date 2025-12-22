@@ -4,6 +4,7 @@ import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
 
 export enum UserRole {
   USER = 'user',
+  ADMIN = 'admin',
 }
 
 @Entity('users')

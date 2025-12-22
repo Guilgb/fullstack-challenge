@@ -1,3 +1,4 @@
+import { Roles } from '@modules/auth/decorators/roles.decorator';
 import {
   Body,
   Controller,
@@ -19,6 +20,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { UserRole } from '@shared/modules/database/entities/user.entity';
 import { CreateUserUseCase } from './use-cases/create/create.use-case';
 import { CreateUserDto } from './use-cases/create/dto/user.create.dto';
 import { DeleteUserUseCase } from './use-cases/delete/delete.use-case';
@@ -139,6 +141,7 @@ export class UserController {
   }
 
   @Get(':idOrEmail')
+  @Roles(UserRole.USER, UserRole.ADMIN)
   @MessagePattern('user.get')
   @ApiBearerAuth()
   @ApiOperation({

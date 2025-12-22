@@ -44,13 +44,20 @@ export class ProxyService implements OnModuleInit, OnModuleDestroy {
     await this.authServiceClient?.close();
   }
 
-  async sendToAuthService<T>(pattern: string, data: unknown): Promise<T> {
+  async sendToAuthService<T>(
+    pattern: string,
+    data: unknown,
+    query?: unknown,
+  ): Promise<T> {
     const timeoutMs = process.env.NODE_ENV === 'production' ? 5000 : 10000;
     this.logger.debug(
       `Enviando para Auth Service — pattern: ${pattern}, timeout: ${timeoutMs}ms, data: ${JSON.stringify(data)}`,
     );
+
+    const payload = query === undefined ? data : { data, query };
+
     return firstValueFrom(
-      this.authServiceClient.send<T>(pattern, data).pipe(
+      this.authServiceClient.send<T>(pattern, payload).pipe(
         timeout(timeoutMs),
         catchError((error: unknown) => {
           let errTrace: string;

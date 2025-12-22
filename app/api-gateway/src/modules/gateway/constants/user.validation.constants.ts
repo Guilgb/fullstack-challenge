@@ -38,6 +38,8 @@ export const VALIDATION_MESSAGES = {
     USERNAME: {
       REQUIRED: 'Nome de usuário é obrigatório',
       NOT_FOUND: 'Usuário não encontrado',
+      MAX_LENGTH: 'Nome de usuário não pode ultrapassar 100 caracteres',
+      MIN_LENGTH: 'Nome de usuário deve ter no mínimo 2 caracteres',
     },
   },
 } as const;
