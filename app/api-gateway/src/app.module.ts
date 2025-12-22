@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './modules/auth/auth.module';
@@ -18,12 +18,12 @@ import { WebsocketModule } from './modules/websocket/websocket.module';
     }),
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
+      inject: [],
+      useFactory: () => ({
         throttlers: [
           {
-            ttl: config.get<number>('THROTTLE_TTL', 1000),
-            limit: config.get<number>('THROTTLE_LIMIT', 10),
+            ttl: Number(process.env.THROTTLE_TTL) || 1000,
+            limit: Number(process.env.THROTTLE_LIMIT) || 10,
           },
         ],
       }),

@@ -1,3 +1,5 @@
+import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
+import { Roles } from '@modules/auth/decorators/roles.decorator';
 import {
   Body,
   Controller,
@@ -17,11 +19,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CurrentUser, Roles } from '../../auth/decorators';
 import { UserRole } from '../../auth/enums/roles.enum';
 import { AuthenticatedUser } from '../../auth/interfaces/auth.interface';
 import { ProxyService } from '../../proxy/services/proxy.service';
-import { CreateUserDto, PaginationDto, UpdateUserDto } from '../dto';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { PaginationDto } from '../dto/pagination.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @ApiTags('users')
 @ApiBearerAuth()

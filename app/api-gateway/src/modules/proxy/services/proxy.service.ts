@@ -6,7 +6,6 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import {
   ClientProxy,
   ClientProxyFactory,
@@ -19,18 +18,13 @@ export class ProxyService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(ProxyService.name);
   private authServiceClient: ClientProxy;
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor() {}
 
   async onModuleInit() {
     this.authServiceClient = ClientProxyFactory.create({
       transport: Transport.RMQ,
       options: {
-        urls: [
-          this.configService.get<string>(
-            'RABBITMQ_URL',
-            'amqp://localhost:5672',
-          ),
-        ],
+        urls: [process.env.RABBITMQ_URL || 'amqp://localhost:5672'],
         queue: 'auth_queue',
         queueOptions: {
           durable: true,

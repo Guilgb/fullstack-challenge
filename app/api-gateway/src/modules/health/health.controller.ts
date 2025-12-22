@@ -1,16 +1,16 @@
+import { Public } from '@modules/auth/decorators/public.decorator';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Public } from '../auth/decorators';
 
 @ApiTags('health')
 @Controller('health')
 export class HealthController {
   @Public()
   @Get()
-  @ApiOperation({ summary: 'Health check endpoint' })
+  @ApiOperation({ summary: 'Endpoint de verificação de integridade' })
   @ApiResponse({
     status: 200,
-    description: 'API Gateway is healthy',
+    description: 'API Gateway está saudável',
     schema: {
       properties: {
         status: { type: 'string', example: 'ok' },

@@ -1,3 +1,4 @@
+import { Public } from '@modules/auth/decorators/public.decorator';
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -5,9 +6,9 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Public } from '../../auth/decorators';
 import { ProxyService } from '../../proxy/services/proxy.service';
-import { LoginDto, RefreshTokenDto } from '../dto';
+import { LoginDto } from '../dto/login.dto';
+import { RefreshTokenDto } from '../dto/refresh-token.dto';
 
 @ApiTags('auth')
 @Controller('auth')

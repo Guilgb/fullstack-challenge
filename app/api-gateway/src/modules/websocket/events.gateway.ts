@@ -1,5 +1,4 @@
 import { Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
@@ -38,10 +37,7 @@ export class EventsGateway
   private readonly logger = new Logger(EventsGateway.name);
   private connectedClients: Map<string, AuthenticatedSocket> = new Map();
 
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly jwtService: JwtService) {}
 
   afterInit(_server: Server) {
     this.logger.log('WebSocket Gateway initialized');
@@ -58,7 +54,7 @@ export class EventsGateway
       }
 
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
-        secret: this.configService.get<string>('JWT_SECRET'),
+        secret: process.env.JWT_SECRET,
       });
 
       client.user = {
@@ -71,18 +67,18 @@ export class EventsGateway
       await client.join(`user:${payload.sub}`);
 
       this.logger.log(
-        `Client connected: ${client.id} (User: ${payload.email})`,
+        `Cliente conectado: ${client.id} (Usuário: ${payload.email})`,
       );
 
       client.emit('connected', {
-        message: 'Successfully connected to WebSocket',
+        message: 'Conectado com sucesso ao WebSocket',
         userId: payload.sub,
       });
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+        error instanceof Error ? error.message : 'Erro desconhecido';
       this.logger.warn(
-        `Client ${client.id} disconnected: Invalid token - ${errorMessage}`,
+        `Cliente ${client.id} desconectado: Token inválido - ${errorMessage}`,
       );
       client.disconnect();
     }
@@ -90,7 +86,7 @@ export class EventsGateway
 
   handleDisconnect(client: AuthenticatedSocket) {
     this.connectedClients.delete(client.id);
-    this.logger.log(`Client disconnected: ${client.id}`);
+    this.logger.log(`Cliente desconectado: ${client.id}`);
   }
 
   private extractTokenFromSocket(client: Socket): string | null {
@@ -118,17 +114,18 @@ export class EventsGateway
     @MessageBody() data: { channel: string },
   ) {
     if (!data.channel) {
-      return { event: 'error', data: { message: 'Channel is required' } };
+      return { event: 'error', data: { message: 'Canal é obrigatório' } };
     }
 
     await client.join(data.channel);
-    this.logger.log(
-      `Client ${client.id} subscribed to channel: ${data.channel}`,
-    );
+    this.logger.log(`Cliente ${client.id} inscrito no canal: ${data.channel}`);
 
     return {
       event: 'subscribed',
-      data: { channel: data.channel, message: `Subscribed to ${data.channel}` },
+      data: {
+        channel: data.channel,
+        message: `Inscrito no canal ${data.channel}`,
+      },
     };
   }
 
@@ -138,19 +135,19 @@ export class EventsGateway
     @MessageBody() data: { channel: string },
   ) {
     if (!data.channel) {
-      return { event: 'error', data: { message: 'Channel is required' } };
+      return { event: 'error', data: { message: 'Canal é obrigatório' } };
     }
 
     await client.leave(data.channel);
     this.logger.log(
-      `Client ${client.id} unsubscribed from channel: ${data.channel}`,
+      `Cliente ${client.id} cancelou a inscrição do canal: ${data.channel}`,
     );
 
     return {
       event: 'unsubscribed',
       data: {
         channel: data.channel,
-        message: `Unsubscribed from ${data.channel}`,
+        message: `Cancelado a inscrição de ${data.channel}`,
       },
     };
   }
