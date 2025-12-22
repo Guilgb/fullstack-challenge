@@ -30,7 +30,7 @@ async function bootstrap() {
   const swaggerConfig = new DocumentBuilder()
     .setTitle('API Gateway')
     .setDescription(
-      'API Gateway for microservices - handles authentication, authorization, rate limiting and proxying',
+      'API Gateway para microserviços - lida com autenticação, autorização, limitação de taxa e proxy',
     )
     .setVersion('1.0')
     .addBearerAuth(
@@ -44,9 +44,9 @@ async function bootstrap() {
       },
       'JWT-auth',
     )
-    .addTag('health', 'Health check endpoints')
-    .addTag('auth', 'Authentication endpoints')
-    .addTag('users', 'User management endpoints')
+    .addTag('health', 'Endpoints de verificação de integridade')
+    .addTag('auth', 'Endpoints de autenticação')
+    .addTag('users', 'Endpoints de gerenciamento de usuários')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);

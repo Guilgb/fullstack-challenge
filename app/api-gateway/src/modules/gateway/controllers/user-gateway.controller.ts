@@ -1,4 +1,5 @@
 import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
+import { Public } from '@modules/auth/decorators/public.decorator';
 import { Roles } from '@modules/auth/decorators/roles.decorator';
 import {
   Body,
@@ -78,9 +79,9 @@ export class UserGatewayController {
   }
 
   @Get('me')
-  @ApiOperation({ summary: 'Get current user profile' })
-  @ApiResponse({ status: 200, description: 'User profile retrieved' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiOperation({ summary: 'Pega o perfil do usuário atual' })
+  @ApiResponse({ status: 200, description: 'Perfil do usuário recuperado' })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
   async getProfile(@CurrentUser() user: AuthenticatedUser) {
     return this.proxyService.sendToAuthService('user.get', { id: user.sub });
   }
@@ -103,20 +104,33 @@ export class UserGatewayController {
   }
 
   @Post()
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Criar um novo usuário (Apenas Admin)' })
+  @Public()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Criar novo usuário',
+    description: 'Cria um novo usuário no sistema',
+  })
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Usuário criado com sucesso',
+    schema: {
+      example: {
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        email: 'user@example.com',
+        username: 'john_doe',
+        isEmailVerified: false,
+        createdAt: '2025-12-19T13:50:00.000Z',
+        updatedAt: '2025-12-19T13:50:00.000Z',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Email já está em uso',
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Erro de validação',
-  })
-  @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Email já existe' })
-  @ApiResponse({
-    status: HttpStatus.FORBIDDEN,
-    description: 'Proibido - Apenas Admin',
+    description: 'Dados inválidos',
   })
   async create(@Body() createUserDto: CreateUserDto) {
     return this.proxyService.sendToAuthService('user.create', createUserDto);

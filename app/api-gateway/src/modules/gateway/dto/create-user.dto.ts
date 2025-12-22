@@ -1,54 +1,53 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
-  IsEnum,
   IsNotEmpty,
-  IsOptional,
   IsString,
+  Matches,
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { UserRole } from '../../auth/enums/roles.enum';
+import {
+  FIELD_LIMITS,
+  SWAGGER_EXAMPLES,
+  VALIDATION_MESSAGES,
+  VALIDATION_PATTERNS,
+} from '../constants/user.validation.constants';
 
 export class CreateUserDto {
   @ApiProperty({
-    description: 'User name',
-    example: 'John Doe',
-    minLength: 2,
-    maxLength: 100,
+    description: 'E-mail do usuário',
+    example: SWAGGER_EXAMPLES.USER.EMAIL,
+    maxLength: FIELD_LIMITS.EMAIL.MAX_LENGTH,
   })
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(2)
-  @MaxLength(100)
-  name: string;
-
-  @ApiProperty({
-    description: 'User email address',
-    example: 'john@example.com',
-  })
-  @IsEmail()
-  @IsNotEmpty()
+  @IsString({ message: VALIDATION_MESSAGES.GENERAL.INVALID_STRING })
+  @IsNotEmpty({ message: VALIDATION_MESSAGES.EMAIL.REQUIRED })
+  @IsEmail({}, { message: VALIDATION_MESSAGES.EMAIL.INVALID_FORMAT })
   email: string;
 
   @ApiProperty({
-    description: 'User password',
-    example: 'password123',
-    minLength: 6,
-    maxLength: 100,
+    description: `Senha do usuário (mínimo ${FIELD_LIMITS.PASSWORD.MIN_LENGTH} caracteres)`,
+    example: SWAGGER_EXAMPLES.USER.PASSWORD,
+    minLength: FIELD_LIMITS.PASSWORD.MIN_LENGTH,
+    maxLength: FIELD_LIMITS.PASSWORD.MAX_LENGTH,
+    format: 'password',
   })
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(6)
-  @MaxLength(100)
+  @IsString({ message: VALIDATION_MESSAGES.GENERAL.INVALID_STRING })
+  @MinLength(FIELD_LIMITS.PASSWORD.MIN_LENGTH, {
+    message: VALIDATION_MESSAGES.PASSWORD.MIN_LENGTH,
+  })
+  @MaxLength(FIELD_LIMITS.PASSWORD.MAX_LENGTH)
+  @Matches(VALIDATION_PATTERNS.STRONG_PASSWORD, {
+    message: VALIDATION_MESSAGES.PASSWORD.PATTERN,
+  })
+  @IsNotEmpty({ message: VALIDATION_MESSAGES.PASSWORD.REQUIRED })
   password: string;
 
-  @ApiPropertyOptional({
-    description: 'User role',
-    enum: UserRole,
-    default: UserRole.USER,
+  @ApiProperty({
+    description: 'Nome de usuário',
+    example: SWAGGER_EXAMPLES.USER.USERNAME,
   })
-  @IsOptional()
-  @IsEnum(UserRole)
-  role?: UserRole;
+  @IsString({ message: VALIDATION_MESSAGES.GENERAL.INVALID_STRING })
+  @IsNotEmpty({ message: VALIDATION_MESSAGES.USER.USERNAME.REQUIRED })
+  username: string;
 }

@@ -67,7 +67,7 @@ export class UserController {
     },
   })
   @ApiResponse({
-    status: 409,
+    status: HttpStatus.CONFLICT,
     description: 'Email já está em uso',
   })
   @ApiResponse({
