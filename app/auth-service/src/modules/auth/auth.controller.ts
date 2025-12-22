@@ -1,4 +1,5 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto, LoginResponseDto } from './use-cases/login/dto/login.dto';
 import { LoginUseCase } from './use-cases/login/login.use-case';
@@ -17,6 +18,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @MessagePattern('auth.login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Login',
@@ -39,6 +41,7 @@ export class AuthController {
     return this.loginUseCase.execute(loginDto);
   }
 
+  @MessagePattern('auth.refreshToken')
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
