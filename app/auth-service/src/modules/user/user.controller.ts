@@ -10,6 +10,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -44,6 +45,7 @@ export class UserController {
   ) {}
 
   @Post()
+  @MessagePattern('user.create')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Criar novo usuário',
@@ -77,6 +79,7 @@ export class UserController {
   }
 
   @Get('list')
+  @MessagePattern('user.list')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Listar usuários com paginação',
@@ -136,6 +139,7 @@ export class UserController {
   }
 
   @Get(':idOrEmail')
+  @MessagePattern('user.get')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Obter usuário por ID ou email',
@@ -159,6 +163,7 @@ export class UserController {
   }
 
   @Patch(':idOrEmail')
+  @MessagePattern('user.update')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Atualizar usuário',
@@ -184,6 +189,7 @@ export class UserController {
   }
 
   @Delete(':idOrEmail')
+  @MessagePattern('user.delete')
   @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
