@@ -1,3 +1,8 @@
+import { CurrentUser } from '@modules/auth /decorators/current-user.decorator';
+import { JwtAuthGuard } from '@modules/auth /guards/jwt-auth.guard';
+import { PermissionsGuard } from '@modules/auth /guards/permissions.guard';
+import { RolesGuard } from '@modules/auth /guards/roles.guard';
+import { AuthenticatedUser } from '@modules/auth /interfaces/auth.interface';
 import {
   Body,
   Controller,
@@ -9,9 +14,11 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiNoContentResponse,
@@ -41,9 +48,10 @@ import {
   UpdateTaskParamsDto,
 } from './use-cases/update/dto/update.task.dto';
 import { UpdateTaskUseCase } from './use-cases/update/update.task.use-case';
-import { http } from 'winston';
 
 @ApiTags('tasks')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @Controller('tasks')
 export class TasksController {
   constructor(
@@ -61,6 +69,7 @@ export class TasksController {
   @ApiBody({ type: CreateTaskInputDto })
   @HttpCode(HttpStatus.CREATED)
   async createTask(
+    @CurrentUser() user: AuthenticatedUser,
     @Body() input: CreateTaskInputDto,
   ): Promise<CreateTaskOutputDto> {
     return await this.createTaskUseCase.execute(input);
@@ -75,6 +84,7 @@ export class TasksController {
   @ApiQuery({ name: 'orderDirection', required: false })
   @HttpCode(HttpStatus.OK)
   async listTasks(
+    @CurrentUser() user: AuthenticatedUser,
     @Query() query: ListTasksQueryDto,
   ): Promise<ListTasksReponseDto> {
     return await this.listTasksUseCase.execute(query);
@@ -85,7 +95,10 @@ export class TasksController {
   @ApiOkResponse({ type: TaskResponseDto })
   @ApiParam({ name: 'id', description: 'ID da tarefa' })
   @HttpCode(HttpStatus.OK)
-  async getTask(@Param() params: GetTaskParamsDto): Promise<TaskResponseDto> {
+  async getTask(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param() params: GetTaskParamsDto,
+  ): Promise<TaskResponseDto> {
     return await this.getTaskUseCase.execute(params);
   }
 
@@ -97,6 +110,7 @@ export class TasksController {
   @ApiBody({ type: UpdateTaskInputDto })
   @HttpCode(HttpStatus.OK)
   async updateTask(
+    @CurrentUser() user: AuthenticatedUser,
     @Param() params: UpdateTaskParamsDto,
     @Body() input: UpdateTaskInputDto,
   ): Promise<UpdateTaskOutputDto> {
@@ -108,7 +122,10 @@ export class TasksController {
   @ApiOperation({ summary: 'Remover task' })
   @ApiNoContentResponse({ description: 'Task removida' })
   @ApiParam({ name: 'id', description: 'ID da tarefa' })
-  async deleteTask(@Param() params: DeleteTaskParamsDto): Promise<void> {
+  async deleteTask(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param() params: DeleteTaskParamsDto,
+  ): Promise<void> {
     return await this.deleteTaskUseCase.execute(params);
   }
 }
