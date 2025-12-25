@@ -19,7 +19,7 @@ export class TaskEntity {
   description: string;
 
   @Column({ type: 'enum', enum: priorityEnum, default: priorityEnum.MEDIUM })
-  priority: number;
+  priority: priorityEnum;
 
   @Column({ type: 'timestamp', nullable: true })
   deadline: Date;
