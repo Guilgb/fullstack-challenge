@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { WinstonLoggerService } from '@shared/modules/winston/winston-logger.service';
 import { randomUUID } from 'crypto';
+import { EventsService } from '../../../../shared/services/events.service';
 import { TaskRepositoryInterface } from '../../interfaces/task.repository.interface';
 import { CreateTaskInputDto, CreateTaskOutputDto } from './dto/create.dto';
 
@@ -9,8 +10,12 @@ export class CreateTaskUseCase {
   constructor(
     private readonly winstonLoggerService: WinstonLoggerService,
     private readonly createTaskRepository: TaskRepositoryInterface,
+    private readonly eventsService: EventsService,
   ) {}
-  async execute(input: CreateTaskInputDto): Promise<CreateTaskOutputDto> {
+  async execute(
+    input: CreateTaskInputDto,
+    userId?: string,
+  ): Promise<CreateTaskOutputDto> {
     try {
       const taskId = randomUUID();
       this.winstonLoggerService.log(
@@ -24,6 +29,14 @@ export class CreateTaskUseCase {
         'CreateTaskUseCase',
         { id: task.id },
       );
+
+      await this.eventsService.publishTaskCreated({
+        taskId: task.id,
+        taskTitle: task.title,
+        userId: userId || 'system',
+        assignedTo: input.assignedTo,
+      });
+
       return {
         id: task.id,
         title: task.title,

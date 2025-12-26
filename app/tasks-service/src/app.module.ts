@@ -7,6 +7,7 @@ import { TasksModule } from './modules/tasks/tasks.module';
 import { WinstonLoggerService } from './shared/modules/winston/winston-logger.service';
 import { LoggingInterceptor } from './shared/modules/winston/winston.interceptor';
 import { WinstonModule } from './shared/modules/winston/winston.module';
+import { EventsModule } from './shared/services/events.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -17,6 +18,7 @@ import { WinstonModule } from './shared/modules/winston/winston.module';
     DatabaseModule,
     AuthModule,
     TasksModule,
+    EventsModule,
   ],
   providers: [
     WinstonLoggerService,

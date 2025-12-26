@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { WinstonLoggerService } from '@shared/modules/winston/winston-logger.service';
+import { EventsService } from '../../../../shared/services/events.service';
 import { TaskRepositoryInterface } from '../../interfaces/task.repository.interface';
 import { UpdateTaskInputDto, UpdateTaskParamsDto } from './dto/update.task.dto';
 
@@ -8,8 +9,13 @@ export class UpdateTaskUseCase {
   constructor(
     private readonly taskRepository: TaskRepositoryInterface,
     private readonly winstonLoggerService: WinstonLoggerService,
+    private readonly eventsService: EventsService,
   ) {}
-  async execute(id: UpdateTaskParamsDto, input: UpdateTaskInputDto) {
+  async execute(
+    id: UpdateTaskParamsDto,
+    input: UpdateTaskInputDto,
+    userId?: string,
+  ) {
     try {
       this.winstonLoggerService.log(
         `Atualizando task com id: ${id.id}`,
@@ -24,6 +30,13 @@ export class UpdateTaskUseCase {
         null,
         'UpdateTaskUseCase',
       );
+
+      // Publica evento de task atualizada
+      await this.eventsService.publishTaskUpdated({
+        taskId: updatedTask.id,
+        taskTitle: updatedTask.title,
+        userId: userId || 'system',
+      });
 
       return {
         id: updatedTask.id,

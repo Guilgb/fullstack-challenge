@@ -70,7 +70,7 @@ export class TasksController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() input: CreateTaskInputDto,
   ): Promise<CreateTaskOutputDto> {
-    return await this.createTaskUseCase.execute(input);
+    return await this.createTaskUseCase.execute(input, user?.sub);
   }
 
   @Get()
@@ -112,7 +112,7 @@ export class TasksController {
     @Param() params: UpdateTaskParamsDto,
     @Body() input: UpdateTaskInputDto,
   ): Promise<UpdateTaskOutputDto> {
-    return await this.updateTaskUseCase.execute(params, input);
+    return await this.updateTaskUseCase.execute(params, input, user?.sub);
   }
 
   @Delete(':id')
@@ -124,6 +124,6 @@ export class TasksController {
     @CurrentUser() user: AuthenticatedUser,
     @Param() params: DeleteTaskParamsDto,
   ): Promise<void> {
-    return await this.deleteTaskUseCase.execute(params);
+    return await this.deleteTaskUseCase.execute(params, user?.sub);
   }
 }
