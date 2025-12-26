@@ -30,7 +30,7 @@ async function bootstrap() {
     await app.startAllMicroservices();
     console.log('📡 Microservice RMQ iniciado');
   } catch (err) {
-    this.logger.error(
+    console.error(
       '❌ Falha ao iniciar microservice RMQ:',
       err && (err as Error).message ? (err as Error).message : err,
     );

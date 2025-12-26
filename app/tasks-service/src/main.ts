@@ -29,7 +29,7 @@ async function bootstrap() {
   try {
     await app.startAllMicroservices();
   } catch (err) {
-    this.logger.error(
+    console.error(
       '❌ Falha ao iniciar microservice do task manager:',
       err && (err as Error).message ? (err as Error).message : err,
     );
