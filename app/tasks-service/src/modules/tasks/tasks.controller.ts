@@ -1,7 +1,5 @@
 import { CurrentUser } from '@modules/auth /decorators/current-user.decorator';
-import { JwtAuthGuard } from '@modules/auth /guards/jwt-auth.guard';
-import { PermissionsGuard } from '@modules/auth /guards/permissions.guard';
-import { RolesGuard } from '@modules/auth /guards/roles.guard';
+import { VerifyInternalGuard } from '@modules/auth /guards/verify-internal.guard';
 import { AuthenticatedUser } from '@modules/auth /interfaces/auth.interface';
 import {
   Body,
@@ -51,7 +49,7 @@ import { UpdateTaskUseCase } from './use-cases/update/update.task.use-case';
 
 @ApiTags('tasks')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+@UseGuards(VerifyInternalGuard)
 @Controller('tasks')
 export class TasksController {
   constructor(
