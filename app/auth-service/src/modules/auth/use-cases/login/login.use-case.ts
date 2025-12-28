@@ -46,7 +46,6 @@ export class LoginUseCase {
 
       const access_token = this.jwtService.sign(payload);
 
-      // Gerar refresh token (válido por 7 dias)
       const refresh_token = this.jwtService.sign(payload, {
         expiresIn: '7d',
         secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret',
@@ -55,7 +54,6 @@ export class LoginUseCase {
       const refreshExpiresAt = new Date();
       refreshExpiresAt.setDate(refreshExpiresAt.getDate() + 7);
 
-      // Armazenar refresh token
       this.tokenService.storeRefreshToken(
         user.id,
         refresh_token,

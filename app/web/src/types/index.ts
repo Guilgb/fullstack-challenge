@@ -114,7 +114,6 @@ export interface CreateCommentRequest {
   taskId: string;
 }
 
-// Pagination Types
 export interface PaginationParams {
   page?: number;
   pageSize?: number;
@@ -130,14 +129,12 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-// WebSocket Types
 export interface WebSocketNotification {
   type: "task_created" | "task_updated" | "task_deleted" | "comment_added";
   data: unknown;
   timestamp: string;
 }
 
-// API Error
 export interface ApiError {
   message: string;
   statusCode: number;

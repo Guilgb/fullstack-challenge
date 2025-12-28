@@ -36,7 +36,6 @@ export class VerifyInternalGuard implements CanActivate {
 
     const signatureStr = String(signature);
 
-    // Verifica se os tamanhos são iguais antes de usar timingSafeEqual
     if (expected.length !== signatureStr.length) {
       throw new UnauthorizedException('Assinatura inválida dos headers');
     }

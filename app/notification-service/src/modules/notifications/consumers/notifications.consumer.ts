@@ -72,21 +72,17 @@ export class NotificationsConsumer {
     const originalMsg = context.getMessage();
 
     try {
-      // Cria notificações no banco
       const notifications =
         await this.notificationsService.createFromTaskEvent(event);
 
-      // Envia via WebSocket para cada usuário
       for (const notification of notifications) {
         this.notificationsGateway.sendToUser(notification.userId, notification);
       }
 
-      // Confirma mensagem processada
       channel.ack(originalMsg);
       this.logger.log(`Evento ${event.eventType} processado com sucesso`);
     } catch (error) {
       this.logger.error(`Erro ao processar evento ${event.eventType}:`, error);
-      // Rejeita mensagem para reprocessamento
       channel.nack(originalMsg, false, true);
     }
   }

@@ -31,7 +31,6 @@ export class UpdateTaskUseCase {
         'UpdateTaskUseCase',
       );
 
-      // Publica evento de task atualizada
       await this.eventsService.publishTaskUpdated({
         taskId: updatedTask.id,
         taskTitle: updatedTask.title,

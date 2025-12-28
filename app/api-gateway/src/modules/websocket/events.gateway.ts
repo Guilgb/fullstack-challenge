@@ -152,7 +152,6 @@ export class EventsGateway
     };
   }
 
-  // Métodos para emitir eventos de outros serviços
   emitToUser(userId: string, event: string, data: unknown) {
     this.server.to(`user:${userId}`).emit(event, data);
   }

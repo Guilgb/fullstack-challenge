@@ -7,7 +7,6 @@ import {
   Outlet,
 } from "@tanstack/react-router";
 
-// Create root route
 const rootRoute = createRootRoute({
   component: () => (
     <Layout>
@@ -16,7 +15,6 @@ const rootRoute = createRootRoute({
   ),
 });
 
-// Create routes
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
@@ -41,7 +39,6 @@ const taskDetailRoute = createRoute({
   component: TaskDetailPage,
 });
 
-// Build route tree
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
@@ -49,10 +46,8 @@ const routeTree = rootRoute.addChildren([
   taskDetailRoute,
 ]);
 
-// Create router
 export const router = createRouter({ routeTree });
 
-// Register router for type safety
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;

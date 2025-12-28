@@ -4,7 +4,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  // Adicionar o Winston
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 

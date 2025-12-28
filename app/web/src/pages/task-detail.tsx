@@ -42,7 +42,6 @@ const priorityVariants: Record<
   [TaskPriority.URGENT]: "urgent",
 };
 
-// Mock comments for demo (in real app, this would come from API)
 const mockComments = [
   {
     id: "1",
@@ -78,7 +77,6 @@ export function TaskDetailPage() {
   });
 
   const onSubmitComment = (data: CommentFormData) => {
-    // In real app, this would call the API
     const newComment = {
       id: String(Date.now()),
       content: data.content,

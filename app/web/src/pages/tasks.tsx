@@ -18,7 +18,6 @@ import { useCallback, useMemo, useState } from "react";
 export function TasksPage() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  // Filters state
   const [search, setSearch] = useState("");
   const [priority, setPriority] = useState<TaskPriority | "all">("all");
   const [orderBy, setOrderBy] = useState("createdAt");
@@ -26,15 +25,12 @@ export function TasksPage() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  // Modals state
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-  // Debounce search
   const debouncedSearch = useDebounce(search, 300);
 
-  // Build query params
   const queryParams = useMemo<TasksQueryParams>(
     () => ({
       page,
@@ -47,11 +43,9 @@ export function TasksPage() {
     [page, pageSize, orderBy, orderDirection, priority, debouncedSearch]
   );
 
-  // Fetch tasks
   const { data, isLoading, isError, error } = useTasks(queryParams);
   const deleteMutation = useDeleteTask();
 
-  // Handlers
   const handleEdit = useCallback((task: Task) => {
     setSelectedTask(task);
     setFormModalOpen(true);
@@ -86,7 +80,6 @@ export function TasksPage() {
     setPage(1);
   }, []);
 
-  // Reset to page 1 when filters change
   const handleSearchChange = (value: string) => {
     setSearch(value);
     setPage(1);

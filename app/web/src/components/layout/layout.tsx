@@ -8,7 +8,6 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
-  // Initialize WebSocket connection
   useWebSocket();
 
   return (
