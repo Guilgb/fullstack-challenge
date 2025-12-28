@@ -25,6 +25,11 @@ export class CreateTaskInputDto {
   @IsOptional()
   @IsDate()
   deadline?: Date;
+
+  @ApiPropertyOptional({ description: 'ID do usuário atribuído à tarefa' })
+  @IsOptional()
+  @IsString()
+  assignedTo?: string;
 }
 
 export class CreateTaskOutputDto {
