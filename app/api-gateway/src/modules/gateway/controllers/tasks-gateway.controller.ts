@@ -17,7 +17,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiQuery,
@@ -25,9 +29,17 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { firstValueFrom } from 'rxjs';
+import {
+  CreateTaskInputDto,
+  CreateTaskOutputDto,
+} from '../dto/tasks/create.task.dto';
+import {
+  ListTasksQueryDto,
+  ListTasksReponseDto,
+} from '../dto/tasks/list-tasks.dto';
 
 @ApiTags('tasks')
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @UseInterceptors(SignHeadersInterceptor)
 @Controller('tasks')
 export class TasksGatewayController {
@@ -42,12 +54,15 @@ export class TasksGatewayController {
 
   @Post()
   @ApiOperation({ summary: 'Criar task' })
+  @ApiCreatedResponse({ type: CreateTaskOutputDto })
+  @ApiBadRequestResponse({ description: 'Dados inválidos' })
+  @ApiBody({ type: CreateTaskInputDto })
   @HttpCode(HttpStatus.CREATED)
   async createTask(
     @CurrentUser() user: AuthenticatedUser,
-    @Body() createTaskDto: Record<string, unknown>,
+    @Body() createTaskDto: CreateTaskInputDto,
     @Req() req: Request,
-  ): Promise<unknown> {
+  ): Promise<any> {
     const response = await firstValueFrom(
       this.httpService.post('/tasks', createTaskDto, {
         headers: this.forwardHeaders(req),
@@ -57,7 +72,8 @@ export class TasksGatewayController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar tasks com paginação' })
+  @ApiOperation({ summary: 'Listar tasks (paginação)' })
+  @ApiOkResponse({ type: ListTasksReponseDto })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'pageSize', required: false })
   @ApiQuery({ name: 'orderBy', required: false })
@@ -65,9 +81,9 @@ export class TasksGatewayController {
   @HttpCode(HttpStatus.OK)
   async listTasks(
     @CurrentUser() user: AuthenticatedUser,
-    @Query() query: Record<string, string | number | undefined>,
+    @Query() query: ListTasksQueryDto,
     @Req() req: Request,
-  ): Promise<unknown> {
+  ): Promise<any> {
     const response = await firstValueFrom(
       this.httpService.get('/tasks', {
         params: query,

@@ -15,7 +15,7 @@ export class TaskEntity {
   @Column({ type: 'varchar', nullable: false })
   title: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'text', nullable: true })
   description: string;
 
   @Column({ type: 'enum', enum: priorityEnum, default: priorityEnum.MEDIUM })

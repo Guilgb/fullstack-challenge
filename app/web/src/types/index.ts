@@ -1,4 +1,3 @@
-// Auth Types
 export interface User {
   id: string;
   email: string;
@@ -20,6 +19,14 @@ export interface RegisterRequest {
   username: string;
 }
 
+export interface AuthResponseRaw {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
+  user: User;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
@@ -27,7 +34,12 @@ export interface AuthResponse {
 }
 
 export interface RefreshTokenRequest {
-  refreshToken: string;
+  refresh_token: string;
+}
+
+export interface RefreshTokenResponseRaw {
+  access_token: string;
+  refresh_token: string;
 }
 
 export interface RefreshTokenResponse {
@@ -35,7 +47,6 @@ export interface RefreshTokenResponse {
   refreshToken: string;
 }
 
-// Task Types
 export const TaskPriority = {
   LOW: "LOW",
   MEDIUM: "MEDIUM",

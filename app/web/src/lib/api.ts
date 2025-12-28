@@ -9,10 +9,28 @@ export const api = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+const getAccessToken = (): string | null => {
+  const storeToken = useAuthStore.getState().accessToken;
+  if (storeToken) {
+    return storeToken;
+  }
+
+  try {
+    const stored = localStorage.getItem("auth-storage");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return parsed?.state?.accessToken || null;
+    }
+  } catch (e) {
+    console.error("Error reading token from localStorage:", e);
+  }
+
+  return null;
+};
+
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = useAuthStore.getState().accessToken;
+    const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -21,7 +39,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor for token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiError>) => {
@@ -38,14 +55,15 @@ api.interceptors.response.use(
           const response = await axios.post(
             `${import.meta.env.VITE_API_URL}/auth/refresh`,
             {
-              refreshToken,
+              refresh_token: refreshToken,
             }
           );
 
-          const { accessToken, refreshToken: newRefreshToken } = response.data;
-          useAuthStore.getState().setTokens(accessToken, newRefreshToken);
+          // Backend retorna snake_case
+          const { access_token, refresh_token } = response.data;
+          useAuthStore.getState().setTokens(access_token, refresh_token);
 
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          originalRequest.headers.Authorization = `Bearer ${access_token}`;
           return api(originalRequest);
         }
       } catch (refreshError) {

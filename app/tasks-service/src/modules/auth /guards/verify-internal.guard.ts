@@ -13,6 +13,7 @@ export class VerifyInternalGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const secret = process.env.INTERNAL_SHARED_SECRET;
+
     if (!secret) {
       throw new UnauthorizedException(
         'INTERNAL_SHARED_SECRET não configurado no serviço',
@@ -33,11 +34,15 @@ export class VerifyInternalGuard implements CanActivate {
       .update(String(payload))
       .digest('hex');
 
+    const signatureStr = String(signature);
+
+    // Verifica se os tamanhos são iguais antes de usar timingSafeEqual
+    if (expected.length !== signatureStr.length) {
+      throw new UnauthorizedException('Assinatura inválida dos headers');
+    }
+
     if (
-      !crypto.timingSafeEqual(
-        Buffer.from(expected),
-        Buffer.from(String(signature)),
-      )
+      !crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signatureStr))
     ) {
       throw new UnauthorizedException('Assinatura inválida dos headers');
     }

@@ -25,6 +25,7 @@ export class SignHeadersInterceptor implements NestInterceptor {
     delete request.headers['x-user-signature'];
 
     const user = (request as Request & { user?: unknown }).user;
+
     if (user) {
       const payload = JSON.stringify(user);
       const signature = crypto
