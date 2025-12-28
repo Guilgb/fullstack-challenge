@@ -83,11 +83,11 @@ export interface UpdateTaskRequest {
 }
 
 export interface TasksListResponse {
-  tasks: Task[];
+  data: Task[];
   page: number;
   pageSize: number;
   total: number;
-  totalPages: number;
+  totalPages?: number;
 }
 
 export interface TasksQueryParams {
@@ -99,7 +99,6 @@ export interface TasksQueryParams {
   priority?: TaskPriority;
 }
 
-// Comment Types
 export interface Comment {
   id: string;
   content: string;

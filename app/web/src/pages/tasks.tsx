@@ -141,7 +141,7 @@ export function TasksPage() {
       ) : (
         <>
           <TaskList
-            tasks={data?.tasks || []}
+            tasks={data?.data || []}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
@@ -149,11 +149,13 @@ export function TasksPage() {
           {data && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-sm text-muted-foreground">
-                Mostrando {data.tasks.length} de {data.total} tarefas
+                Mostrando {data.data.length} de {data.total} tarefas
               </p>
               <Pagination
                 page={data.page}
-                totalPages={data.totalPages}
+                totalPages={
+                  data.totalPages || Math.ceil(data.total / data.pageSize)
+                }
                 onPageChange={setPage}
               />
             </div>

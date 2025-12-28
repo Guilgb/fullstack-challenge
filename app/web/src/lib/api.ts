@@ -19,7 +19,7 @@ const getAccessToken = (): string | null => {
     const stored = localStorage.getItem("auth-storage");
     if (stored) {
       const parsed = JSON.parse(stored);
-      return parsed?.state?.accessToken || null;
+      return parsed?.state?.access_token || parsed?.access_token || null;
     }
   } catch (e) {
     console.error("Error reading token from localStorage:", e);
@@ -59,7 +59,6 @@ api.interceptors.response.use(
             }
           );
 
-          // Backend retorna snake_case
           const { access_token, refresh_token } = response.data;
           useAuthStore.getState().setTokens(access_token, refresh_token);
 
