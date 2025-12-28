@@ -31,6 +31,10 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  .container {
+    @apply mx-auto px-4;
+    max-width: 1400px;
+  }
 }
 
 /* Skeleton shimmer effect */
