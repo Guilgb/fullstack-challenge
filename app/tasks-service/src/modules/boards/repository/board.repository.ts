@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   BoardEntity,
   BoardMemberEntity,
+  TaskEntity,
 } from '@shared/modules/database/entities';
 import { BoardRoleEnum } from '@shared/modules/database/entities/board-member.entity';
 import { WinstonLoggerService } from '@shared/modules/winston/winston-logger.service';
@@ -13,6 +14,10 @@ import {
 } from '../interfaces/board.repository.interface';
 import { CreateBoardInputDto } from '../use-cases/create-board/dto/create-board.dto';
 import { ListBoardsQueryDto } from '../use-cases/list-boards/dto/list-boards.dto';
+import {
+  ListTasksBoardsQueryDto,
+  ListTasksBoardsResponseDto,
+} from '../use-cases/list-tasks-boards/dto/list-tasks-boards.dto';
 import { UpdateBoardInputDto } from '../use-cases/update-board/dto/update-board.dto';
 
 @Injectable()
@@ -22,6 +27,8 @@ export class BoardRepository implements BoardRepositoryInterface {
     private readonly boardRepository: Repository<BoardEntity>,
     @InjectRepository(BoardMemberEntity)
     private readonly boardMemberRepository: Repository<BoardMemberEntity>,
+    @InjectRepository(TaskEntity)
+    private readonly taskRepository: Repository<TaskEntity>,
     private readonly logger: WinstonLoggerService,
   ) {}
 
@@ -120,6 +127,37 @@ export class BoardRepository implements BoardRepositoryInterface {
       };
     } catch (error) {
       this.logger.error('Error in BoardRepository.findAllByUserId', error);
+      throw error;
+    }
+  }
+
+  async findAllTasksByBoardId(
+    query: ListTasksBoardsQueryDto,
+  ): Promise<ListTasksBoardsResponseDto> {
+    try {
+      const { boardId, page = 1, pageSize = 10 } = query;
+
+      const [tasks, total] = await this.taskRepository.findAndCount({
+        where: { boardId },
+        order: { createdAt: 'DESC' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      });
+
+      const totalPages = Math.ceil(total / pageSize);
+
+      return {
+        data: tasks,
+        total,
+        page,
+        pageSize,
+        totalPages,
+      };
+    } catch (error) {
+      this.logger.error(
+        'Error in BoardRepository.findAllTasksByBoardId',
+        error,
+      );
       throw error;
     }
   }

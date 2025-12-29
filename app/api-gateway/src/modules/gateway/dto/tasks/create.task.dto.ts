@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsDate, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export enum priorityEnum {
   LOW = 'LOW',
@@ -28,14 +29,20 @@ export class CreateTaskInputDto {
     type: String,
     format: 'date-time',
   })
+  @Type(() => Date)
   @IsOptional()
   @IsDate()
   deadline?: Date;
 
   @ApiPropertyOptional({ description: 'ID do usuário atribuído à tarefa' })
   @IsOptional()
-  @IsString()
+  @IsUUID()
   assignedTo?: string;
+
+  @ApiPropertyOptional({ description: 'ID do board' })
+  @IsOptional()
+  @IsUUID()
+  boardId?: string;
 }
 
 export class CreateTaskOutputDto {
@@ -57,6 +64,15 @@ export class CreateTaskOutputDto {
     format: 'date-time',
   })
   deadline?: Date;
+
+  @ApiPropertyOptional({ description: 'ID do board' })
+  boardId?: string;
+
+  @ApiPropertyOptional({ description: 'ID do usuário atribuído à tarefa' })
+  assignedTo?: string;
+
+  @ApiProperty({ description: 'ID do criador da tarefa' })
+  createdBy: string;
 
   @ApiProperty({
     description: 'Data de criação',

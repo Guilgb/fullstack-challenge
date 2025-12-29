@@ -55,6 +55,8 @@ import {
   ListBoardsQueryDto,
   ListBoardsResponseDto,
 } from './use-cases/list-boards/dto/list-boards.dto';
+import { ListTasksBoardsResponseDto } from './use-cases/list-tasks-boards/dto/list-tasks-boards.dto';
+import { ListTasksBoardsUseCase } from './use-cases/list-tasks-boards/list-tasks-boards.use-case';
 import {
   AddMemberInputDto,
   AddMemberOutputDto,
@@ -78,6 +80,7 @@ export class BoardsController {
     private readonly updateBoardUseCase: UpdateBoardUseCase,
     private readonly deleteBoardUseCase: DeleteBoardUseCase,
     private readonly manageMembersUseCase: ManageMembersUseCase,
+    private readonly listTasksBoardsUseCase: ListTasksBoardsUseCase,
   ) {}
 
   @Post()
@@ -117,6 +120,26 @@ export class BoardsController {
     @Param() params: GetBoardParamsDto,
   ): Promise<BoardResponseDto> {
     return await this.getBoardUseCase.execute(params, user?.sub);
+  }
+
+  @Get(':boardId/tasks')
+  @ApiOperation({ summary: 'Listar tasks do board' })
+  @ApiOkResponse({ type: ListTasksBoardsResponseDto })
+  @ApiNotFoundResponse({ description: 'Board não encontrado' })
+  @ApiParam({ name: 'boardId', description: 'ID do board' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'pageSize', required: false })
+  @HttpCode(HttpStatus.OK)
+  async listBoardTasks(
+    @Param('boardId') boardId: string,
+    @Query('page') page?: number,
+    @Query('pageSize') pageSize?: number,
+  ): Promise<ListTasksBoardsResponseDto> {
+    return await this.listTasksBoardsUseCase.execute({
+      boardId,
+      page: page || 1,
+      pageSize: pageSize || 10,
+    });
   }
 
   @Put(':id')

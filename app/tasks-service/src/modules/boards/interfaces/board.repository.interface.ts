@@ -5,6 +5,10 @@ import {
 import { BoardRoleEnum } from '@shared/modules/database/entities/board-member.entity';
 import { CreateBoardInputDto } from '../use-cases/create-board/dto/create-board.dto';
 import { ListBoardsQueryDto } from '../use-cases/list-boards/dto/list-boards.dto';
+import {
+  ListTasksBoardsQueryDto,
+  ListTasksBoardsResponseDto,
+} from '../use-cases/list-tasks-boards/dto/list-tasks-boards.dto';
 import { UpdateBoardInputDto } from '../use-cases/update-board/dto/update-board.dto';
 
 export interface PaginatedResult<T> {
@@ -34,6 +38,10 @@ export abstract class BoardRepositoryInterface {
     userId: string,
     options: ListBoardsQueryDto,
   ): Promise<PaginatedResult<BoardEntity>>;
+
+  abstract findAllTasksByBoardId(
+    query: ListTasksBoardsQueryDto,
+  ): Promise<ListTasksBoardsResponseDto>;
 
   abstract addMember(
     memberId: string,

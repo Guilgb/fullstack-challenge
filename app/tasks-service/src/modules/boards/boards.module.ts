@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   BoardEntity,
   BoardMemberEntity,
+  TaskEntity,
 } from '@shared/modules/database/entities';
 import { WinstonModule } from '@shared/modules/winston/winston.module';
 import { BoardsController } from './boards.controller';
@@ -16,10 +17,11 @@ import {
   ManageMembersUseCase,
   UpdateBoardUseCase,
 } from './use-cases';
+import { ListTasksBoardsUseCase } from './use-cases/list-tasks-boards/list-tasks-boards.use-case';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([BoardEntity, BoardMemberEntity]),
+    TypeOrmModule.forFeature([BoardEntity, BoardMemberEntity, TaskEntity]),
     WinstonModule,
   ],
   controllers: [BoardsController],
@@ -30,6 +32,7 @@ import {
     UpdateBoardUseCase,
     DeleteBoardUseCase,
     ManageMembersUseCase,
+    ListTasksBoardsUseCase,
     { provide: BoardRepositoryInterface, useClass: BoardRepository },
   ],
   exports: [BoardRepositoryInterface],

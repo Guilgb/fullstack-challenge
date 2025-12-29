@@ -32,6 +32,7 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { firstValueFrom } from 'rxjs';
+import { ListTasksBoardsResponseDto } from '../dto/boards/list-tasks-board.dto';
 
 @ApiTags('boards')
 @ApiBearerAuth('JWT-auth')
@@ -80,6 +81,32 @@ export class BoardsGatewayController {
       this.httpService.get('/boards', {
         params: query,
         headers: this.forwardHeaders(req),
+      }),
+    );
+    return response.data;
+  }
+
+  @Get(':boardId/tasks')
+  @ApiOperation({ summary: 'Listar tasks do board' })
+  @ApiOkResponse({ type: ListTasksBoardsResponseDto })
+  @ApiNotFoundResponse({ description: 'Board não encontrado' })
+  @ApiParam({ name: 'boardId', description: 'ID do board' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'pageSize', required: false })
+  @HttpCode(HttpStatus.OK)
+  async listBoardTasks(
+    @Param('boardId') boardId: string,
+    @Query('page') page?: number,
+    @Query('pageSize') pageSize?: number,
+    @Req() req?: Request,
+  ): Promise<any> {
+    const response = await firstValueFrom(
+      this.httpService.get(`/boards/${boardId}/tasks`, {
+        params: {
+          page: page || 1,
+          pageSize: pageSize || 10,
+        },
+        headers: req ? this.forwardHeaders(req) : {},
       }),
     );
     return response.data;
@@ -144,7 +171,6 @@ export class BoardsGatewayController {
     );
   }
 
-  // Member management endpoints
   @Post(':boardId/members')
   @ApiOperation({ summary: 'Adicionar membro ao board' })
   @ApiCreatedResponse({ description: 'Membro adicionado' })

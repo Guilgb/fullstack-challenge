@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { priorityEnum } from '@shared/modules/database/entities/tasks.entity';
+import { Type } from 'class-transformer';
 import { IsDate, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateTaskInputDto {
@@ -23,6 +24,7 @@ export class CreateTaskInputDto {
     format: 'date-time',
   })
   @IsOptional()
+  @Type(() => Date)
   @IsDate()
   deadline?: Date;
 
