@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
 
 const NOTIFICATION_WS_URL =
-  import.meta.env.VITE_NOTIFICATION_WS_URL || "http://localhost:4001";
+  import.meta.env.VITE_NOTIFICATION_WS_URL || "http://localhost:3002";
 
 export interface Notification {
   id: string;
@@ -36,7 +36,6 @@ export function useNotifications() {
 
       setNotifications((prev) => [notification, ...prev]);
 
-      // Mostrar toast baseado no tipo
       switch (notification.type) {
         case "TASK_ASSIGNED":
           toast({
@@ -79,7 +78,6 @@ export function useNotifications() {
   );
 
   useEffect(() => {
-    // Cleanup anterior se não estiver autenticado
     if (!isAuthenticated || !user?.id) {
       if (socketRef.current) {
         socketRef.current.disconnect();
@@ -97,7 +95,6 @@ export function useNotifications() {
 
     socket.on("connect", () => {
       console.log("Notification WebSocket connected");
-      // Autenticar com userId
       socket.emit("authenticate", { userId: user.id });
     });
 
@@ -105,7 +102,6 @@ export function useNotifications() {
       console.log("Notification WebSocket authenticated:", data);
       setIsConnected(true);
 
-      // Buscar notificações iniciais
       socket.emit("get_notifications", { limit: 20 });
     });
 
