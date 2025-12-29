@@ -19,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useBoard } from "@/hooks/use-boards";
 import { useCreateTask, useUpdateTask } from "@/hooks/use-tasks";
 import { taskSchema, type TaskFormData } from "@/schemas";
-import { TaskPriority, type BoardMember, type Task } from "@/types";
+import { TaskPriority, TaskStatus, type BoardMember, type Task } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, User } from "lucide-react";
 import { useEffect } from "react";
@@ -37,6 +37,13 @@ const priorityOptions = [
   { value: TaskPriority.MEDIUM, label: "Média" },
   { value: TaskPriority.HIGH, label: "Alta" },
   { value: TaskPriority.URGENT, label: "Urgente" },
+];
+
+const statusOptions = [
+  { value: TaskStatus.TODO, label: "A Fazer" },
+  { value: TaskStatus.IN_PROGRESS, label: "Em Progresso" },
+  { value: TaskStatus.REVIEW, label: "Em Revisão" },
+  { value: TaskStatus.DONE, label: "Concluído" },
 ];
 
 export function TaskFormModal({
@@ -62,6 +69,7 @@ export function TaskFormModal({
       title: "",
       description: "",
       priority: TaskPriority.MEDIUM,
+      status: TaskStatus.TODO,
       deadline: null,
       assignedTo: null,
     },
@@ -78,6 +86,7 @@ export function TaskFormModal({
         title: task.title,
         description: task.description || "",
         priority: task.priority,
+        status: task.status || TaskStatus.TODO,
         deadline: task.deadline ? task.deadline.split("T")[0] : null,
         assignedTo: task.assignedTo || null,
       });
@@ -86,6 +95,7 @@ export function TaskFormModal({
         title: "",
         description: "",
         priority: TaskPriority.MEDIUM,
+        status: TaskStatus.TODO,
         deadline: null,
         assignedTo: null,
       });
@@ -97,6 +107,7 @@ export function TaskFormModal({
       title: data.title,
       description: data.description || undefined,
       priority: data.priority,
+      status: data.status,
       deadline: data.deadline
         ? new Date(data.deadline).toISOString()
         : undefined,
@@ -190,9 +201,31 @@ export function TaskFormModal({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="deadline">Prazo</Label>
-              <Input id="deadline" type="date" {...register("deadline")} />
+              <Label htmlFor="status">Status</Label>
+              <Controller
+                name="status"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statusOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="deadline">Prazo</Label>
+            <Input id="deadline" type="date" {...register("deadline")} />
           </div>
 
           {boardId && members.length > 0 && (

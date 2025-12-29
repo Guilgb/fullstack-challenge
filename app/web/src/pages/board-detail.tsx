@@ -1,7 +1,7 @@
 import { AddMemberModal, BoardFormModal } from "@/components/boards";
 import { DeleteTaskModal } from "@/components/tasks/delete-task-modal";
+import { KanbanBoard } from "@/components/tasks/kanban-board";
 import { TaskFormModal } from "@/components/tasks/task-form-modal";
-import { TaskList } from "@/components/tasks/task-list";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,7 +45,7 @@ export function BoardDetailPage() {
 
   const [taskParams] = useState<TasksQueryParams>({
     page: 1,
-    pageSize: 20,
+    pageSize: 100, // Pegar mais tasks para o Kanban
     boardId,
   });
 
@@ -204,34 +204,31 @@ export function BoardDetailPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
 
-        {/* Tasks Section */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Tarefas</h2>
-            <Button onClick={handleCreateTask}>
-              <Plus className="mr-2 h-4 w-4" />
-              Nova Tarefa
-            </Button>
-          </div>
-
-          {isTasksLoading ? (
-            <div className="space-y-4">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-24 rounded-lg border bg-muted animate-pulse"
-                />
-              ))}
-            </div>
-          ) : (
-            <TaskList
-              tasks={tasksData?.data || []}
-              onEdit={handleEditTask}
-              onDelete={handleDeleteTask}
-            />
-          )}
+      {/* Kanban Board Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Tarefas</h2>
+          <Button onClick={handleCreateTask}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nova Tarefa
+          </Button>
         </div>
+
+        {isTasksLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-64 rounded-lg bg-muted animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <KanbanBoard
+            tasks={tasksData?.data || []}
+            onEdit={handleEditTask}
+            onDelete={handleDeleteTask}
+          />
+        )}
       </div>
 
       {/* Modals */}

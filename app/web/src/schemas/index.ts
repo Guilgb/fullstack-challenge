@@ -1,4 +1,4 @@
-import { TaskPriority } from "@/types";
+import { TaskPriority, TaskStatus } from "@/types";
 import { z } from "zod";
 
 export const loginSchema = z.object({
@@ -44,6 +44,12 @@ export const taskSchema = z.object({
     TaskPriority.MEDIUM,
     TaskPriority.HIGH,
     TaskPriority.URGENT,
+  ]),
+  status: z.enum([
+    TaskStatus.TODO,
+    TaskStatus.IN_PROGRESS,
+    TaskStatus.REVIEW,
+    TaskStatus.DONE,
   ]),
   deadline: z.string().nullable(),
   assignedTo: z.string().uuid().nullable().optional(),

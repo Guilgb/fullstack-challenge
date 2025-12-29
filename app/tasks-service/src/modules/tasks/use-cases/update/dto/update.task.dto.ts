@@ -1,5 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { priorityEnum } from '@shared/modules/database/entities/tasks.entity';
+import {
+  priorityEnum,
+  statusEnum,
+} from '@shared/modules/database/entities/tasks.entity';
 import { Type } from 'class-transformer';
 import { IsDate, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 
@@ -24,6 +27,11 @@ export class UpdateTaskInputDto {
   @IsEnum(priorityEnum)
   priority?: priorityEnum;
 
+  @ApiPropertyOptional({ description: 'Status da tarefa' })
+  @IsOptional()
+  @IsEnum(statusEnum)
+  status?: statusEnum;
+
   @ApiPropertyOptional({
     description: 'Prazo da tarefa',
     type: String,
@@ -38,6 +46,11 @@ export class UpdateTaskInputDto {
   @IsOptional()
   @IsUUID()
   boardId?: string;
+
+  @ApiPropertyOptional({ description: 'ID do usuário atribuído' })
+  @IsOptional()
+  @IsUUID()
+  assignedTo?: string;
 }
 
 export class UpdateTaskOutputDto {
@@ -52,6 +65,9 @@ export class UpdateTaskOutputDto {
 
   @ApiPropertyOptional({ description: 'Prioridade da tarefa' })
   priority: priorityEnum;
+
+  @ApiPropertyOptional({ description: 'Status da tarefa' })
+  status: statusEnum;
 
   @ApiPropertyOptional({
     description: 'Prazo da tarefa',

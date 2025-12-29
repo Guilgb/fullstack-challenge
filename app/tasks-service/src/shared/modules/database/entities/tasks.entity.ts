@@ -16,6 +16,13 @@ export enum priorityEnum {
   URGENT = 'URGENT',
 }
 
+export enum statusEnum {
+  TODO = 'TODO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  REVIEW = 'REVIEW',
+  DONE = 'DONE',
+}
+
 @Entity('tasks')
 export class TaskEntity {
   @PrimaryColumn('uuid')
@@ -29,6 +36,9 @@ export class TaskEntity {
 
   @Column({ type: 'enum', enum: priorityEnum, default: priorityEnum.MEDIUM })
   priority: priorityEnum;
+
+  @Column({ type: 'enum', enum: statusEnum, default: statusEnum.TODO })
+  status: statusEnum;
 
   @Column({ type: 'timestamp', nullable: true })
   deadline: Date;

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { formatDate } from "@/lib/utils";
 import type { Task } from "@/types";
-import { TaskPriority } from "@/types";
+import { TaskPriority, TaskStatus } from "@/types";
 import { Link } from "@tanstack/react-router";
 import {
   Calendar,
@@ -43,6 +43,13 @@ const priorityVariants: Record<
   [TaskPriority.URGENT]: "urgent",
 };
 
+const statusLabels: Record<TaskStatus, string> = {
+  [TaskStatus.TODO]: "A Fazer",
+  [TaskStatus.IN_PROGRESS]: "Em Progresso",
+  [TaskStatus.REVIEW]: "Em Revisão",
+  [TaskStatus.DONE]: "Concluído",
+};
+
 export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -55,6 +62,9 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
             <Badge variant={priorityVariants[task.priority]}>
               {priorityLabels[task.priority]}
             </Badge>
+            {task.status && (
+              <Badge variant="outline">{statusLabels[task.status]}</Badge>
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">

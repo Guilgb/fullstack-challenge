@@ -42,6 +42,7 @@ export class UpdateTaskUseCase {
         title: updatedTask.title,
         description: updatedTask.description,
         priority: updatedTask.priority,
+        status: updatedTask.status,
         deadLine: updatedTask.deadline,
         createdAt: updatedTask.createdAt,
         updatedAt: updatedTask.updatedAt,

@@ -56,11 +56,21 @@ export const TaskPriority = {
 
 export type TaskPriority = (typeof TaskPriority)[keyof typeof TaskPriority];
 
+export const TaskStatus = {
+  TODO: "TODO",
+  IN_PROGRESS: "IN_PROGRESS",
+  REVIEW: "REVIEW",
+  DONE: "DONE",
+} as const;
+
+export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
+
 export interface Task {
   id: string;
   title: string;
   description: string;
   priority: TaskPriority;
+  status: TaskStatus;
   deadline: string | null;
   boardId?: string;
   assignedTo?: string;
@@ -73,6 +83,7 @@ export interface CreateTaskRequest {
   title: string;
   description?: string;
   priority?: TaskPriority;
+  status?: TaskStatus;
   deadline?: string;
   boardId?: string;
   assignedTo?: string;
@@ -82,6 +93,7 @@ export interface UpdateTaskRequest {
   title?: string;
   description?: string;
   priority?: TaskPriority;
+  status?: TaskStatus;
   deadline?: string;
   assignedTo?: string;
 }
