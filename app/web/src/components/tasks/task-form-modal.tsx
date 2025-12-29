@@ -255,7 +255,7 @@ export function TaskFormModal({
                         <SelectItem key={member.userId} value={member.userId}>
                           <span className="flex items-center gap-2">
                             <User className="h-4 w-4" />
-                            Usuário {member.userId.slice(0, 8)}...
+                            Usuário {member.username.slice(0, 8)}...
                           </span>
                         </SelectItem>
                       ))}
