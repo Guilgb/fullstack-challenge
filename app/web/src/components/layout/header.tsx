@@ -12,7 +12,7 @@ import {
 import { useLogout } from "@/hooks/use-auth";
 import { useAuthStore } from "@/store/auth";
 import { Link } from "@tanstack/react-router";
-import { Bell, CheckSquare, LogOut, User } from "lucide-react";
+import { Bell, CheckSquare, Kanban, LogOut, User } from "lucide-react";
 import { useState } from "react";
 
 export function Header() {
@@ -44,6 +44,13 @@ export function Header() {
               <>
                 <Link to="/tasks">
                   <Button variant="ghost">Tarefas</Button>
+                </Link>
+
+                <Link to="/boards">
+                  <Button variant="ghost">
+                    <Kanban className="mr-2 h-4 w-4" />
+                    Boards
+                  </Button>
                 </Link>
 
                 <Button variant="ghost" size="icon" className="relative">

@@ -19,8 +19,10 @@ import {
   ArrowLeft,
   Calendar,
   Clock,
+  Kanban,
   MessageSquare,
   Send,
+  User,
 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -171,6 +173,26 @@ export function TaskDetailPage() {
               <span className="text-muted-foreground">Última atualização:</span>
               <span>{formatDateTime(task.updatedAt)}</span>
             </div>
+            {task.assignedTo && (
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Atribuído a:</span>
+                <span>{task.assignedTo.slice(0, 8)}...</span>
+              </div>
+            )}
+            {task.boardId && (
+              <div className="flex items-center gap-2">
+                <Kanban className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Board:</span>
+                <Link
+                  to="/boards/$boardId"
+                  params={{ boardId: task.boardId }}
+                  className="text-primary hover:underline"
+                >
+                  Ver board
+                </Link>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

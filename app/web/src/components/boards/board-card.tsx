@@ -8,52 +8,30 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatDate } from "@/lib/utils";
-import type { Task } from "@/types";
-import { TaskPriority } from "@/types";
+import type { Board } from "@/types";
 import { Link } from "@tanstack/react-router";
-import {
-  Calendar,
-  Eye,
-  MoreVertical,
-  Pencil,
-  Trash2,
-  User,
-} from "lucide-react";
+import { Eye, MoreVertical, Pencil, Trash2, Users } from "lucide-react";
 
-interface TaskCardProps {
-  task: Task;
-  onEdit?: (task: Task) => void;
-  onDelete?: (task: Task) => void;
+interface BoardCardProps {
+  board: Board;
+  onEdit?: (board: Board) => void;
+  onDelete?: (board: Board) => void;
 }
 
-const priorityLabels: Record<TaskPriority, string> = {
-  [TaskPriority.LOW]: "Baixa",
-  [TaskPriority.MEDIUM]: "Média",
-  [TaskPriority.HIGH]: "Alta",
-  [TaskPriority.URGENT]: "Urgente",
-};
+export function BoardCard({ board, onEdit, onDelete }: BoardCardProps) {
+  const memberCount = board.members?.length || 0;
 
-const priorityVariants: Record<
-  TaskPriority,
-  "low" | "medium" | "high" | "urgent"
-> = {
-  [TaskPriority.LOW]: "low",
-  [TaskPriority.MEDIUM]: "medium",
-  [TaskPriority.HIGH]: "high",
-  [TaskPriority.URGENT]: "urgent",
-};
-
-export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-lg font-medium line-clamp-1">
-            {task.title}
+            {board.name}
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Badge variant={priorityVariants[task.priority]}>
-              {priorityLabels[task.priority]}
+            <Badge variant="secondary" className="flex items-center gap-1">
+              <Users className="h-3 w-3" />
+              {memberCount}
             </Badge>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -63,20 +41,20 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link to="/tasks/$taskId" params={{ taskId: task.id }}>
+                  <Link to="/boards/$boardId" params={{ boardId: board.id }}>
                     <Eye className="mr-2 h-4 w-4" />
                     Ver detalhes
                   </Link>
                 </DropdownMenuItem>
                 {onEdit && (
-                  <DropdownMenuItem onClick={() => onEdit(task)}>
+                  <DropdownMenuItem onClick={() => onEdit(board)}>
                     <Pencil className="mr-2 h-4 w-4" />
                     Editar
                   </DropdownMenuItem>
                 )}
                 {onDelete && (
                   <DropdownMenuItem
-                    onClick={() => onDelete(task)}
+                    onClick={() => onDelete(board)}
                     className="text-destructive focus:text-destructive"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
@@ -89,29 +67,13 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
         </div>
       </CardHeader>
       <CardContent>
-        {task.description && (
+        {board.description && (
           <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-            {task.description}
+            {board.description}
           </p>
         )}
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <Calendar className="h-3 w-3" />
-              <span>Criado em {formatDate(task.createdAt)}</span>
-            </div>
-            {task.assignedTo && (
-              <div className="flex items-center gap-1">
-                <User className="h-3 w-3" />
-                <span>Atribuído: {task.assignedTo.slice(0, 8)}...</span>
-              </div>
-            )}
-          </div>
-          {task.deadline && (
-            <div className="flex items-center gap-1">
-              <span>Prazo: {formatDate(task.deadline)}</span>
-            </div>
-          )}
+          <span>Criado em {formatDate(board.createdAt)}</span>
         </div>
       </CardContent>
     </Card>

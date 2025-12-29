@@ -16,11 +16,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useBoard } from "@/hooks/use-boards";
 import { useCreateTask, useUpdateTask } from "@/hooks/use-tasks";
 import { taskSchema, type TaskFormData } from "@/schemas";
-import { TaskPriority, type Task } from "@/types";
+import { TaskPriority, type BoardMember, type Task } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, User } from "lucide-react";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -28,6 +29,7 @@ interface TaskFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   task?: Task | null;
+  boardId?: string;
 }
 
 const priorityOptions = [
@@ -41,8 +43,12 @@ export function TaskFormModal({
   open,
   onOpenChange,
   task,
+  boardId,
 }: TaskFormModalProps) {
   const isEditing = !!task;
+
+  // Buscar dados do board para obter membros
+  const { data: board } = useBoard(boardId || "");
 
   const {
     register,
@@ -57,6 +63,7 @@ export function TaskFormModal({
       description: "",
       priority: TaskPriority.MEDIUM,
       deadline: null,
+      assignedTo: null,
     },
   });
 
@@ -72,6 +79,7 @@ export function TaskFormModal({
         description: task.description || "",
         priority: task.priority,
         deadline: task.deadline ? task.deadline.split("T")[0] : null,
+        assignedTo: task.assignedTo || null,
       });
     } else {
       reset({
@@ -79,6 +87,7 @@ export function TaskFormModal({
         description: "",
         priority: TaskPriority.MEDIUM,
         deadline: null,
+        assignedTo: null,
       });
     }
   }, [task, reset]);
@@ -91,6 +100,8 @@ export function TaskFormModal({
       deadline: data.deadline
         ? new Date(data.deadline).toISOString()
         : undefined,
+      boardId: boardId || undefined,
+      assignedTo: data.assignedTo || undefined,
     };
 
     if (isEditing && task) {
@@ -112,6 +123,9 @@ export function TaskFormModal({
       });
     }
   };
+
+  // Obter lista de membros do board
+  const members: BoardMember[] = board?.members || [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -180,6 +194,44 @@ export function TaskFormModal({
               <Input id="deadline" type="date" {...register("deadline")} />
             </div>
           </div>
+
+          {boardId && members.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="assignedTo">Atribuir a</Label>
+              <Controller
+                name="assignedTo"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={(value) =>
+                      field.onChange(value === "unassigned" ? null : value)
+                    }
+                    value={field.value || "unassigned"}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um membro" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="unassigned">
+                        <span className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          Não atribuído
+                        </span>
+                      </SelectItem>
+                      {members.map((member) => (
+                        <SelectItem key={member.userId} value={member.userId}>
+                          <span className="flex items-center gap-2">
+                            <User className="h-4 w-4" />
+                            Usuário {member.userId.slice(0, 8)}...
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+          )}
 
           <DialogFooter>
             <Button

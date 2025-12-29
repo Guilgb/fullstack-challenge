@@ -1,4 +1,6 @@
-export { HomePage } from './home'
-export { LoginPage } from './login'
-export { TasksPage } from './tasks'
-export { TaskDetailPage } from './task-detail'
+export { BoardDetailPage } from "./board-detail";
+export { BoardsPage } from "./boards";
+export { HomePage } from "./home";
+export { LoginPage } from "./login";
+export { TaskDetailPage } from "./task-detail";
+export { TasksPage } from "./tasks";

@@ -62,7 +62,9 @@ export interface Task {
   description: string;
   priority: TaskPriority;
   deadline: string | null;
+  boardId?: string;
   assignedTo?: string;
+  createdBy: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -72,6 +74,7 @@ export interface CreateTaskRequest {
   description?: string;
   priority?: TaskPriority;
   deadline?: string;
+  boardId?: string;
   assignedTo?: string;
 }
 
@@ -80,6 +83,7 @@ export interface UpdateTaskRequest {
   description?: string;
   priority?: TaskPriority;
   deadline?: string;
+  assignedTo?: string;
 }
 
 export interface TasksListResponse {
@@ -97,6 +101,65 @@ export interface TasksQueryParams {
   orderDirection?: "ASC" | "DESC";
   search?: string;
   priority?: TaskPriority;
+  boardId?: string;
+}
+
+// Board Types
+export const BoardRole = {
+  OWNER: "OWNER",
+  ADMIN: "ADMIN",
+  MEMBER: "MEMBER",
+} as const;
+
+export type BoardRole = (typeof BoardRole)[keyof typeof BoardRole];
+
+export interface BoardMember {
+  id: string;
+  userId: string;
+  role: BoardRole;
+  joinedAt: string;
+}
+
+export interface Board {
+  id: string;
+  name: string;
+  description?: string;
+  ownerId: string;
+  members: BoardMember[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBoardRequest {
+  name: string;
+  description?: string;
+}
+
+export interface UpdateBoardRequest {
+  name?: string;
+  description?: string;
+}
+
+export interface BoardsListResponse {
+  data: Board[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface BoardsQueryParams {
+  page?: number;
+  pageSize?: number;
+}
+
+export interface AddMemberRequest {
+  userId: string;
+  role?: BoardRole;
+}
+
+export interface UpdateMemberRoleRequest {
+  role: BoardRole;
 }
 
 export interface Comment {

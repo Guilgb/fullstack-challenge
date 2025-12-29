@@ -1,5 +1,12 @@
 import { Layout } from "@/components/layout";
-import { HomePage, LoginPage, TaskDetailPage, TasksPage } from "@/pages";
+import {
+  BoardDetailPage,
+  BoardsPage,
+  HomePage,
+  LoginPage,
+  TaskDetailPage,
+  TasksPage,
+} from "@/pages";
 import {
   createRootRoute,
   createRoute,
@@ -39,11 +46,25 @@ const taskDetailRoute = createRoute({
   component: TaskDetailPage,
 });
 
+const boardsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/boards",
+  component: BoardsPage,
+});
+
+const boardDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/boards/$boardId",
+  component: BoardDetailPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   tasksRoute,
   taskDetailRoute,
+  boardsRoute,
+  boardDetailRoute,
 ]);
 
 export const router = createRouter({ routeTree });
