@@ -116,6 +116,7 @@ export type BoardRole = (typeof BoardRole)[keyof typeof BoardRole];
 export interface BoardMember {
   id: string;
   userId: string;
+  username: string;
   role: BoardRole;
   joinedAt: string;
 }

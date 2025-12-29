@@ -7,6 +7,7 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 import { BoardEntity } from './board.entity';
+import { UserEntity } from './user.entity';
 
 export enum BoardRoleEnum {
   OWNER = 'OWNER',
@@ -33,6 +34,12 @@ export class BoardMemberEntity {
   })
   @JoinColumn({ name: 'boardId' })
   board: BoardEntity;
+
+  @ManyToOne(() => UserEntity, user => user.id, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'userId' })
+  user: UserEntity;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   joinedAt: Date;

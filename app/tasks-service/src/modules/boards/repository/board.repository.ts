@@ -63,7 +63,7 @@ export class BoardRepository implements BoardRepositoryInterface {
     try {
       return await this.boardRepository.findOne({
         where: { id },
-        relations: ['members'],
+        relations: ['members', 'members.user'],
       });
     } catch (error) {
       this.logger.error('Error in BoardRepository.findByIdWithMembers', error);

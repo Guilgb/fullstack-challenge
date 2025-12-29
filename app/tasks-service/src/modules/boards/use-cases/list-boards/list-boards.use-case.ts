@@ -31,6 +31,7 @@ export class ListBoardsUseCase {
           board.members?.map(m => ({
             id: m.id,
             userId: m.userId,
+            username: m.user.username,
             role: m.role,
             joinedAt: m.joinedAt,
           })) || [],

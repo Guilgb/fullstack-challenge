@@ -163,12 +163,12 @@ export function BoardDetailPage() {
                   <div className="flex items-center gap-2">
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                       <span className="text-xs font-medium">
-                        {member.userId.slice(0, 2).toUpperCase()}
+                        {member.username.slice(0, 2).toUpperCase()}
                       </span>
                     </div>
                     <div>
                       <p className="text-sm font-medium truncate max-w-[120px]">
-                        {member.userId}
+                        {member.username}
                       </p>
                       <Badge variant="outline" className="text-xs">
                         {roleLabels[member.role]}

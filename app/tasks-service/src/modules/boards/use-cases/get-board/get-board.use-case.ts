@@ -22,7 +22,6 @@ export class GetBoardUseCase {
       throw new NotFoundException('Board not found');
     }
 
-    // Check if user has access to this board
     const isMember = await this.boardRepository.isMember(params.id, userId);
     if (!isMember) {
       throw new NotFoundException('Board not found');
@@ -37,6 +36,7 @@ export class GetBoardUseCase {
         board.members?.map(m => ({
           id: m.id,
           userId: m.userId,
+          username: m.user.username,
           role: m.role,
           joinedAt: m.joinedAt,
         })) || [],
