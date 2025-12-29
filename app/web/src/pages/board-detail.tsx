@@ -45,7 +45,7 @@ export function BoardDetailPage() {
 
   const [taskParams] = useState<TasksQueryParams>({
     page: 1,
-    pageSize: 100, // Pegar mais tasks para o Kanban
+    pageSize: 100,
     boardId,
   });
 

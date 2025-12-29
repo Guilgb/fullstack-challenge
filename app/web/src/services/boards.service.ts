@@ -35,7 +35,6 @@ export const boardsService = {
     await api.delete(`/boards/${id}`);
   },
 
-  // Member management
   addMember: async (
     boardId: string,
     data: AddMemberRequest

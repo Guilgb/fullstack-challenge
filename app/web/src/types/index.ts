@@ -116,7 +116,6 @@ export interface TasksQueryParams {
   boardId?: string;
 }
 
-// Board Types
 export const BoardRole = {
   OWNER: "OWNER",
   ADMIN: "ADMIN",

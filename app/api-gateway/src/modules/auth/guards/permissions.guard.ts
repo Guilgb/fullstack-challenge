@@ -47,7 +47,6 @@ export class PermissionsGuard implements CanActivate {
     return true;
   }
 
-  // todo melhoria futura: buscar permissões do banco de dados
   private getRolePermissions(role: UserRole | string): string[] {
     const rolePermissionsMap: Record<string, string[]> = {
       [UserRole.ADMIN]: ['read', 'write', 'delete', 'manage_users'],

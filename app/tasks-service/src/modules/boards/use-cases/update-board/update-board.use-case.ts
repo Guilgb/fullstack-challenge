@@ -31,7 +31,6 @@ export class UpdateBoardUseCase {
       throw new NotFoundException('Board not found');
     }
 
-    // Only owner can update board
     if (board.ownerId !== userId) {
       throw new ForbiddenException('Only the owner can update this board');
     }

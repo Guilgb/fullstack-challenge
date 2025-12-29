@@ -23,7 +23,6 @@ export class DeleteBoardUseCase {
       throw new NotFoundException('Board not found');
     }
 
-    // Only owner can delete board
     if (board.ownerId !== userId) {
       throw new ForbiddenException('Only the owner can delete this board');
     }

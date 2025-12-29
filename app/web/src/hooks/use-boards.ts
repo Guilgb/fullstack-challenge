@@ -105,7 +105,6 @@ export function useDeleteBoard() {
   });
 }
 
-// Member management hooks
 export function useAddMember() {
   const queryClient = useQueryClient();
 

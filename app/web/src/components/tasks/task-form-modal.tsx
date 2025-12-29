@@ -54,7 +54,6 @@ export function TaskFormModal({
 }: TaskFormModalProps) {
   const isEditing = !!task;
 
-  // Buscar dados do board para obter membros
   const { data: board } = useBoard(boardId || "");
 
   const {
@@ -135,7 +134,6 @@ export function TaskFormModal({
     }
   };
 
-  // Obter lista de membros do board
   const members: BoardMember[] = board?.members || [];
 
   return (

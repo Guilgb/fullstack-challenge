@@ -27,7 +27,6 @@ export class UpdateTaskUseCase {
         'UpdateTaskUseCase',
       );
 
-      // Buscar task antes da atualização para comparar valores
       const existingTask = await this.taskRepository.findById(id.id);
       if (!existingTask) {
         throw new NotFoundException('Task não encontrada');
@@ -44,7 +43,6 @@ export class UpdateTaskUseCase {
         'UpdateTaskUseCase',
       );
 
-      // Verificar se foi atribuída a outro usuário
       if (
         input.assignedTo &&
         input.assignedTo !== previousAssignedTo &&
@@ -58,14 +56,11 @@ export class UpdateTaskUseCase {
         });
       }
 
-      // Verificar se o status mudou
       if (input.status && input.status !== previousStatus) {
-        // Notificar o usuário atribuído se não for o mesmo que fez a mudança
         const participants: string[] = [];
         if (updatedTask.assignedTo && updatedTask.assignedTo !== userId) {
           participants.push(updatedTask.assignedTo);
         }
-        // Também notificar o criador se não for o mesmo usuário
         if (
           updatedTask.createdBy &&
           updatedTask.createdBy !== userId &&
@@ -86,7 +81,6 @@ export class UpdateTaskUseCase {
         }
       }
 
-      // Evento genérico de atualização
       await this.eventsService.publishTaskUpdated({
         taskId: updatedTask.id,
         taskTitle: updatedTask.title,

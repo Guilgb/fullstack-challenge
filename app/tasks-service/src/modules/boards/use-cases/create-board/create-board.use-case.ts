@@ -24,7 +24,6 @@ export class CreateBoardUseCase {
     const boardId = randomUUID();
     const board = await this.boardRepository.create(input, boardId, userId);
 
-    // Add owner as a member with OWNER role
     const memberId = randomUUID();
     await this.boardRepository.addMember(
       memberId,

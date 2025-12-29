@@ -38,7 +38,6 @@ export class ManageMembersUseCase {
       throw new NotFoundException('Board not found');
     }
 
-    // Check if current user is owner or admin
     const currentMember = await this.boardRepository.findMember(
       params.boardId,
       userId,
@@ -51,7 +50,6 @@ export class ManageMembersUseCase {
       throw new ForbiddenException('Only owners and admins can add members');
     }
 
-    // Check if user is already a member
     const existingMember = await this.boardRepository.findMember(
       params.boardId,
       input.userId,
@@ -93,12 +91,10 @@ export class ManageMembersUseCase {
       throw new NotFoundException('Board not found');
     }
 
-    // Cannot remove the owner
     if (params.userId === board.ownerId) {
       throw new BadRequestException('Cannot remove the board owner');
     }
 
-    // Check if current user is owner or admin
     const currentMember = await this.boardRepository.findMember(
       params.boardId,
       userId,
@@ -133,12 +129,10 @@ export class ManageMembersUseCase {
       throw new NotFoundException('Board not found');
     }
 
-    // Only owner can update roles
     if (board.ownerId !== userId) {
       throw new ForbiddenException('Only the owner can update member roles');
     }
 
-    // Cannot change owner's role
     if (params.userId === board.ownerId) {
       throw new BadRequestException('Cannot change the owner role');
     }
