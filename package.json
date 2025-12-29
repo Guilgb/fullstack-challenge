@@ -1,0 +1,32 @@
+{
+  "name": "fullstack-challenge",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "app/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "dev:api-gateway": "turbo run dev --filter=api-gateway",
+    "dev:auth-service": "turbo run dev --filter=auth-service",
+    "dev:tasks-service": "turbo run dev --filter=tasks-service",
+    "dev:notification-service": "turbo run dev --filter=notification-service",
+    "dev:web": "turbo run dev --filter=web",
+    "dev:services": "turbo run dev --filter=api-gateway --filter=auth-service --filter=tasks-service --filter=notification-service",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:cov": "turbo run test:cov",
+    "test:e2e": "turbo run test:e2e",
+    "format": "turbo run format",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "start:prod": "turbo run start:prod"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4"
+  },
+  "packageManager": "npm@10.8.2",
+  "engines": {
+    "node": ">=18"
+  }
+}
