@@ -109,6 +109,7 @@ export class BoardRepository implements BoardRepositoryInterface {
       const queryBuilder = this.boardRepository
         .createQueryBuilder('board')
         .leftJoinAndSelect('board.members', 'members')
+        .leftJoinAndSelect('members.user', 'user')
         .where('board.ownerId = :userId', { userId })
         .orWhere('members.userId = :userId', { userId })
         .orderBy('board.createdAt', 'DESC')
