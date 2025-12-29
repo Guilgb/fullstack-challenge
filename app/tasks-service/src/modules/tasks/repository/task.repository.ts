@@ -82,11 +82,10 @@ export class TaskRepository implements TaskRepositoryInterface {
   async delete(id: string): Promise<void> {
     try {
       const findTask = await this.taskRepository.findOne({ where: { id } });
-
       if (!findTask) {
         throw new Error('Task not found');
       }
-      await this.taskRepository.delete(findTask);
+      await this.taskRepository.delete(findTask.id);
     } catch (error) {
       this.winstonLoggerService.error('Error in TaskRepository.delete', error);
       throw error;

@@ -15,7 +15,6 @@ export class DeleteTaskUseCase {
   async execute(params: DeleteTaskParamsDto, userId?: string) {
     try {
       const task = await this.taskRepository.findById(params.id);
-
       await this.taskRepository.delete(params.id);
       this.winstonLoggerService.log(
         `Task deletada com sucesso`,
