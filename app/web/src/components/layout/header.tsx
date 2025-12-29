@@ -1,4 +1,5 @@
 import { AuthModal } from "@/components/auth";
+import { NotificationsDropdown } from "@/components/layout/notifications-dropdown";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,7 @@ import {
 import { useLogout } from "@/hooks/use-auth";
 import { useAuthStore } from "@/store/auth";
 import { Link } from "@tanstack/react-router";
-import { Bell, CheckSquare, Kanban, LogOut, User } from "lucide-react";
+import { CheckSquare, Kanban, LogOut, User } from "lucide-react";
 import { useState } from "react";
 
 export function Header() {
@@ -53,12 +54,7 @@ export function Header() {
                   </Button>
                 </Link>
 
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
-                    0
-                  </span>
-                </Button>
+                <NotificationsDropdown />
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

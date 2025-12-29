@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { WinstonLoggerService } from '@shared/modules/winston/winston-logger.service';
 import { EventsService } from '../../../../shared/services/events.service';
 import { TaskRepositoryInterface } from '../../interfaces/task.repository.interface';
@@ -23,6 +27,15 @@ export class UpdateTaskUseCase {
         'UpdateTaskUseCase',
       );
 
+      // Buscar task antes da atualização para comparar valores
+      const existingTask = await this.taskRepository.findById(id.id);
+      if (!existingTask) {
+        throw new NotFoundException('Task não encontrada');
+      }
+
+      const previousStatus = existingTask.status;
+      const previousAssignedTo = existingTask.assignedTo;
+
       const updatedTask = await this.taskRepository.update(id, input);
 
       this.winstonLoggerService.log(
@@ -31,6 +44,49 @@ export class UpdateTaskUseCase {
         'UpdateTaskUseCase',
       );
 
+      // Verificar se foi atribuída a outro usuário
+      if (
+        input.assignedTo &&
+        input.assignedTo !== previousAssignedTo &&
+        input.assignedTo !== userId
+      ) {
+        await this.eventsService.publishTaskAssigned({
+          taskId: updatedTask.id,
+          taskTitle: updatedTask.title,
+          userId: userId || 'system',
+          assignedTo: input.assignedTo,
+        });
+      }
+
+      // Verificar se o status mudou
+      if (input.status && input.status !== previousStatus) {
+        // Notificar o usuário atribuído se não for o mesmo que fez a mudança
+        const participants: string[] = [];
+        if (updatedTask.assignedTo && updatedTask.assignedTo !== userId) {
+          participants.push(updatedTask.assignedTo);
+        }
+        // Também notificar o criador se não for o mesmo usuário
+        if (
+          updatedTask.createdBy &&
+          updatedTask.createdBy !== userId &&
+          updatedTask.createdBy !== updatedTask.assignedTo
+        ) {
+          participants.push(updatedTask.createdBy);
+        }
+
+        if (participants.length > 0) {
+          await this.eventsService.publishTaskStatusChanged({
+            taskId: updatedTask.id,
+            taskTitle: updatedTask.title,
+            userId: userId || 'system',
+            previousStatus,
+            newStatus: input.status,
+            participants,
+          });
+        }
+      }
+
+      // Evento genérico de atualização
       await this.eventsService.publishTaskUpdated({
         taskId: updatedTask.id,
         taskTitle: updatedTask.title,
@@ -48,7 +104,10 @@ export class UpdateTaskUseCase {
         updatedAt: updatedTask.updatedAt,
       };
     } catch (error) {
-      if (error instanceof BadRequestException) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
         throw error;
       }
 
