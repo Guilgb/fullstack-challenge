@@ -14,7 +14,7 @@ export class CreateTaskUseCase {
   ) {}
   async execute(
     input: CreateTaskInputDto,
-    userId?: string,
+    userId: string,
   ): Promise<CreateTaskOutputDto> {
     try {
       const taskId = randomUUID();
@@ -23,7 +23,11 @@ export class CreateTaskUseCase {
         'CreateTaskUseCase',
         { ...input },
       );
-      const task = await this.createTaskRepository.create(input, taskId);
+      const task = await this.createTaskRepository.create(
+        input,
+        taskId,
+        userId,
+      );
       this.winstonLoggerService.log(
         `Task criada com sucesso: ${taskId}`,
         'CreateTaskUseCase',
@@ -43,6 +47,9 @@ export class CreateTaskUseCase {
         description: task.description,
         priority: task.priority,
         deadline: task.deadline,
+        boardId: task.boardId,
+        assignedTo: task.assignedTo,
+        createdBy: task.createdBy,
         createdAt: task.createdAt,
         updatedAt: task.updatedAt,
       };

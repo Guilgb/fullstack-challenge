@@ -1,4 +1,13 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { BoardEntity } from './board.entity';
 
 export enum priorityEnum {
   LOW = 'LOW',
@@ -24,10 +33,26 @@ export class TaskEntity {
   @Column({ type: 'timestamp', nullable: true })
   deadline: Date;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'uuid', nullable: true })
+  boardId: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  assignedTo: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  createdBy: string;
+
+  @ManyToOne(() => BoardEntity, board => board.tasks, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'boardId' })
+  board: BoardEntity;
+
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @Column({
+  @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',

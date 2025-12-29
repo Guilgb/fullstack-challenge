@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
 import { ProxyModule } from '../proxy/proxy.module';
 import { AuthGatewayController } from './controllers/auth-gateway.controller';
+import { BoardsGatewayController } from './controllers/boards-gateway.controller';
 import { TasksGatewayController } from './controllers/tasks-gateway.controller';
 import { UserGatewayController } from './controllers/user-gateway.controller';
 
@@ -21,6 +22,7 @@ import { UserGatewayController } from './controllers/user-gateway.controller';
     AuthGatewayController,
     UserGatewayController,
     TasksGatewayController,
+    BoardsGatewayController,
   ],
 })
 export class GatewayModule {}

@@ -22,12 +22,19 @@ export class TaskRepository implements TaskRepositoryInterface {
     private readonly winstonLoggerService: WinstonLoggerService,
   ) {}
 
-  async create(input: CreateTaskInputDto, taskId: string): Promise<TaskEntity> {
+  async create(
+    input: CreateTaskInputDto,
+    taskId: string,
+    createdBy: string,
+  ): Promise<TaskEntity> {
     try {
       const taskCreated = this.taskRepository.create({
         ...input,
         id: taskId,
         priority: input.priority,
+        createdBy,
+        boardId: input.boardId,
+        assignedTo: input.assignedTo,
       });
       return this.taskRepository.save(taskCreated);
     } catch (error) {
@@ -95,9 +102,21 @@ export class TaskRepository implements TaskRepositoryInterface {
         pageSize = 10,
         orderBy = 'createdAt',
         orderDirection = 'DESC',
+        boardId,
+        userId,
       } = options;
 
+      const whereConditions: Record<string, unknown> = {};
+      if (boardId) {
+        whereConditions.boardId = boardId;
+      }
+      if (userId) {
+        whereConditions.createdBy = userId;
+      }
+
       const [data, total] = await this.taskRepository.findAndCount({
+        where:
+          Object.keys(whereConditions).length > 0 ? whereConditions : undefined,
         skip: (page - 1) * pageSize,
         take: pageSize,
         order: { [orderBy]: orderDirection },
@@ -115,6 +134,43 @@ export class TaskRepository implements TaskRepositoryInterface {
     } catch (error) {
       this.winstonLoggerService.error(
         'Error in TaskRepository.findAllPaginated',
+        error,
+      );
+      throw error;
+    }
+  }
+
+  async findByBoardId(
+    boardId: string,
+    options: PaginationOptions,
+  ): Promise<PaginatedResult<TaskEntity>> {
+    try {
+      const {
+        page = 1,
+        pageSize = 10,
+        orderBy = 'createdAt',
+        orderDirection = 'DESC',
+      } = options;
+
+      const [data, total] = await this.taskRepository.findAndCount({
+        where: { boardId },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        order: { [orderBy]: orderDirection },
+      });
+
+      const totalPages = Math.ceil(total / pageSize);
+
+      return {
+        data,
+        total,
+        page,
+        pageSize,
+        totalPages,
+      };
+    } catch (error) {
+      this.winstonLoggerService.error(
+        'Error in TaskRepository.findByBoardId',
         error,
       );
       throw error;
