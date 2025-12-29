@@ -134,9 +134,13 @@ export function useWebSocket() {
     }
   }, []);
 
+  const isConnected = useCallback(() => {
+    return socketRef.current?.connected ?? false;
+  }, []);
+
   return {
-    socket: socketRef.current,
     subscribe,
     unsubscribe,
+    isConnected,
   };
 }
