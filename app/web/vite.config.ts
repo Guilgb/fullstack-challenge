@@ -12,6 +12,23 @@ export default defineConfig(({ mode }) => {
         "@": path.resolve(__dirname, "./src"),
       },
     },
+    test: {
+      globals: true,
+      environment: "jsdom",
+      setupFiles: "./src/test/setup.ts",
+      css: true,
+      coverage: {
+        provider: "v8",
+        reporter: ["text", "json", "html"],
+        exclude: [
+          "node_modules/",
+          "src/test/",
+          "**/*.config.{js,ts}",
+          "**/*.d.ts",
+          "**/types/",
+        ],
+      },
+    },
     server: {
       port: parseInt(env.VITE_PORT) || 3000,
       proxy: {
