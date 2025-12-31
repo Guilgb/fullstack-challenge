@@ -20,6 +20,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNoContentResponse,
@@ -32,7 +33,31 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { firstValueFrom } from 'rxjs';
+import {
+  CreateBoardInputDto,
+  CreateBoardOutputDto,
+} from '../dto/boards/create-board.dto';
+import { DeleteBoardParamsDto } from '../dto/boards/delete-board.dto';
+import { RemoveMemberParamsDto } from '../dto/boards/delete-members.dto';
+import {
+  ListBoardsQueryDto,
+  ListBoardsResponseDto,
+} from '../dto/boards/list-boards.dto';
 import { ListTasksBoardsResponseDto } from '../dto/boards/list-tasks-board.dto';
+import {
+  AddMemberInputDto,
+  AddMemberOutputDto,
+  AddMemberParamsDto,
+} from '../dto/boards/manage-members.dto';
+import {
+  UpdateBoardInputDto,
+  UpdateBoardOutputDto,
+  UpdateBoardParamsDto,
+} from '../dto/boards/update-board.dto';
+import {
+  UpdateMemberRoleInputDto,
+  UpdateMemberRoleParamsDto,
+} from '../dto/boards/update-members.dto';
 
 @ApiTags('boards')
 @ApiBearerAuth('JWT-auth')
@@ -50,12 +75,13 @@ export class BoardsGatewayController {
 
   @Post()
   @ApiOperation({ summary: 'Criar board' })
-  @ApiCreatedResponse({ description: 'Board criado com sucesso' })
+  @ApiCreatedResponse({ type: CreateBoardOutputDto })
   @ApiBadRequestResponse({ description: 'Dados inválidos' })
+  @ApiBody({ type: CreateBoardInputDto })
   @HttpCode(HttpStatus.CREATED)
   async createBoard(
     @CurrentUser() user: AuthenticatedUser,
-    @Body() createBoardDto: Record<string, unknown>,
+    @Body() createBoardDto: CreateBoardInputDto,
     @Req() req: Request,
   ): Promise<unknown> {
     const response = await firstValueFrom(
@@ -68,13 +94,13 @@ export class BoardsGatewayController {
 
   @Get()
   @ApiOperation({ summary: 'Listar boards do usuário' })
-  @ApiOkResponse({ description: 'Lista de boards' })
+  @ApiOkResponse({ type: ListBoardsResponseDto })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'pageSize', required: false })
   @HttpCode(HttpStatus.OK)
   async listBoards(
     @CurrentUser() user: AuthenticatedUser,
-    @Query() query: Record<string, unknown>,
+    @Query() query: ListBoardsQueryDto,
     @Req() req: Request,
   ): Promise<unknown> {
     const response = await firstValueFrom(
@@ -133,19 +159,21 @@ export class BoardsGatewayController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar board' })
-  @ApiOkResponse({ description: 'Board atualizado' })
+  @ApiOkResponse({ type: UpdateBoardOutputDto })
+  @ApiBadRequestResponse({ description: 'Dados inválidos' })
   @ApiNotFoundResponse({ description: 'Board não encontrado' })
   @ApiForbiddenResponse({ description: 'Sem permissão' })
   @ApiParam({ name: 'id', description: 'ID do board' })
+  @ApiBody({ type: UpdateBoardInputDto })
   @HttpCode(HttpStatus.OK)
   async updateBoard(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
-    @Body() updateBoardDto: Record<string, unknown>,
+    @Param() params: UpdateBoardParamsDto,
+    @Body() updateBoardDto: UpdateBoardInputDto,
     @Req() req: Request,
   ): Promise<unknown> {
     const response = await firstValueFrom(
-      this.httpService.put(`/boards/${id}`, updateBoardDto, {
+      this.httpService.put(`/boards/${params.id}`, updateBoardDto, {
         headers: this.forwardHeaders(req),
       }),
     );
@@ -161,11 +189,11 @@ export class BoardsGatewayController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBoard(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
+    @Param() params: DeleteBoardParamsDto,
     @Req() req: Request,
   ): Promise<void> {
     await firstValueFrom(
-      this.httpService.delete(`/boards/${id}`, {
+      this.httpService.delete(`/boards/${params.id}`, {
         headers: this.forwardHeaders(req),
       }),
     );
@@ -173,20 +201,21 @@ export class BoardsGatewayController {
 
   @Post(':boardId/members')
   @ApiOperation({ summary: 'Adicionar membro ao board' })
-  @ApiCreatedResponse({ description: 'Membro adicionado' })
+  @ApiCreatedResponse({ type: AddMemberOutputDto })
   @ApiBadRequestResponse({ description: 'Dados inválidos' })
   @ApiNotFoundResponse({ description: 'Board não encontrado' })
   @ApiForbiddenResponse({ description: 'Sem permissão' })
   @ApiParam({ name: 'boardId', description: 'ID do board' })
+  @ApiBody({ type: AddMemberInputDto })
   @HttpCode(HttpStatus.CREATED)
   async addMember(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('boardId') boardId: string,
-    @Body() addMemberDto: Record<string, unknown>,
+    @Param() params: AddMemberParamsDto,
+    @Body() input: AddMemberInputDto,
     @Req() req: Request,
   ): Promise<unknown> {
     const response = await firstValueFrom(
-      this.httpService.post(`/boards/${boardId}/members`, addMemberDto, {
+      this.httpService.post(`/boards/${params.boardId}/members`, input, {
         headers: this.forwardHeaders(req),
       }),
     );
@@ -203,36 +232,38 @@ export class BoardsGatewayController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeMember(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('boardId') boardId: string,
-    @Param('userId') userId: string,
+    @Param() params: RemoveMemberParamsDto,
     @Req() req: Request,
   ): Promise<void> {
     await firstValueFrom(
-      this.httpService.delete(`/boards/${boardId}/members/${userId}`, {
-        headers: this.forwardHeaders(req),
-      }),
+      this.httpService.delete(
+        `/boards/${params.boardId}/members/${params.userId}`,
+        {
+          headers: this.forwardHeaders(req),
+        },
+      ),
     );
   }
 
   @Patch(':boardId/members/:userId/role')
   @ApiOperation({ summary: 'Atualizar role do membro' })
-  @ApiOkResponse({ description: 'Role atualizada' })
+  @ApiOkResponse({ type: AddMemberOutputDto })
   @ApiBadRequestResponse({ description: 'Dados inválidos' })
   @ApiNotFoundResponse({ description: 'Board não encontrado' })
   @ApiForbiddenResponse({ description: 'Sem permissão' })
   @ApiParam({ name: 'boardId', description: 'ID do board' })
   @ApiParam({ name: 'userId', description: 'ID do usuário' })
+  @ApiBody({ type: UpdateMemberRoleInputDto })
   @HttpCode(HttpStatus.OK)
   async updateMemberRole(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('boardId') boardId: string,
-    @Param('userId') userId: string,
-    @Body() updateRoleDto: Record<string, unknown>,
+    @Param() params: UpdateMemberRoleParamsDto,
+    @Body() updateRoleDto: UpdateMemberRoleInputDto,
     @Req() req: Request,
   ): Promise<unknown> {
     const response = await firstValueFrom(
       this.httpService.patch(
-        `/boards/${boardId}/members/${userId}/role`,
+        `/boards/${params.boardId}/members/${params.userId}/role`,
         updateRoleDto,
         {
           headers: this.forwardHeaders(req),

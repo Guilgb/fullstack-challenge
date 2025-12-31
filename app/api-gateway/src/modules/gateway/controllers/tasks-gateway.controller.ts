@@ -21,6 +21,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -33,10 +34,17 @@ import {
   CreateTaskInputDto,
   CreateTaskOutputDto,
 } from '../dto/tasks/create.task.dto';
+import { DeleteTaskParamsDto } from '../dto/tasks/delete.task.dto';
+import { GetTaskParamsDto, TaskResponseDto } from '../dto/tasks/get.task.dto';
 import {
   ListTasksQueryDto,
   ListTasksReponseDto,
 } from '../dto/tasks/list-tasks.dto';
+import {
+  UpdateTaskInputDto,
+  UpdateTaskOutputDto,
+  UpdateTaskParamsDto,
+} from '../dto/tasks/update.task.dto';
 
 @ApiTags('tasks')
 @ApiBearerAuth('JWT-auth')
@@ -95,15 +103,15 @@ export class TasksGatewayController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Obter task por ID' })
+  @ApiOkResponse({ type: TaskResponseDto })
   @ApiParam({ name: 'id', description: 'ID da tarefa' })
-  @HttpCode(HttpStatus.OK)
   async getTask(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
+    @Param() params: GetTaskParamsDto,
     @Req() req: Request,
   ): Promise<unknown> {
     const response = await firstValueFrom(
-      this.httpService.get(`/tasks/${id}`, {
+      this.httpService.get(`/tasks/${params.id}`, {
         headers: this.forwardHeaders(req),
       }),
     );
@@ -112,16 +120,19 @@ export class TasksGatewayController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar task' })
+  @ApiOkResponse({ type: UpdateTaskOutputDto })
+  @ApiBadRequestResponse({ description: 'Dados inválidos' })
   @ApiParam({ name: 'id', description: 'ID da tarefa' })
+  @ApiBody({ type: UpdateTaskInputDto })
   @HttpCode(HttpStatus.OK)
   async updateTask(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
-    @Body() updateTaskDto: Record<string, unknown>,
+    @Param() params: UpdateTaskParamsDto,
+    @Body() updateTaskDto: UpdateTaskInputDto,
     @Req() req: Request,
   ): Promise<unknown> {
     const response = await firstValueFrom(
-      this.httpService.put(`/tasks/${id}`, updateTaskDto, {
+      this.httpService.put(`/tasks/${params.id}`, updateTaskDto, {
         headers: this.forwardHeaders(req),
       }),
     );
@@ -129,16 +140,17 @@ export class TasksGatewayController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Remover task' })
-  @ApiParam({ name: 'id', description: 'ID da tarefa' })
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Remover task' })
+  @ApiNoContentResponse({ description: 'Task removida' })
+  @ApiParam({ name: 'id', description: 'ID da tarefa' })
   async deleteTask(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
+    @Param() params: DeleteTaskParamsDto,
     @Req() req: Request,
   ): Promise<void> {
     await firstValueFrom(
-      this.httpService.delete(`/tasks/${id}`, {
+      this.httpService.delete(`/tasks/${params.id}`, {
         headers: this.forwardHeaders(req),
       }),
     );
