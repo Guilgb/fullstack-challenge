@@ -1,0 +1,57 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+**/dist
+build
+**/build
+
+# Logs
+logs
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.docker
+
+# Tests
+coverage
+**/coverage
+**/__tests__
+**/*.test.ts
+**/*.spec.ts
+**/test
+
+# Documentation
+*.md
+docs
+
+# Environment files (include only in production)
+.env
+.env.*
+!.env.example
+
+# Misc
+.turbo
+.eslintcache
+.npm

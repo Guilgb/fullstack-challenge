@@ -6,36 +6,29 @@ services:
     build:
       context: .
       dockerfile: ./app/web/Dockerfile
-      target: development
+      target: production
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:3001}
     ports:
-      - "5173:5173"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/app/web/node_modules
+      - "80:80"
     environment:
-      - NODE_ENV=development
-      - VITE_API_URL=http://localhost:3001
+      - NODE_ENV=production
     depends_on:
       - api-gateway
     networks:
       - challenge-network
+    restart: always
 
-  # API Gateway
   api-gateway:
     container_name: api-gateway
     build:
       context: .
       dockerfile: ./app/api-gateway/Dockerfile
-      target: development
+      target: production
     ports:
       - "3001:3001"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/app/api-gateway/node_modules
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=3001
       - AUTH_SERVICE_HOST=auth-service
       - AUTH_SERVICE_PORT=3002
@@ -43,37 +36,34 @@ services:
       - TASKS_SERVICE_PORT=3003
       - NOTIFICATION_SERVICE_HOST=notification-service
       - NOTIFICATION_SERVICE_PORT=3004
-      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
-      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - RABBITMQ_URL=${RABBITMQ_URL:-amqp://admin:admin@rabbitmq:5672}
+      - JWT_SECRET=${JWT_SECRET}
     depends_on:
       rabbitmq:
         condition: service_healthy
     networks:
       - challenge-network
+    restart: always
 
   auth-service:
     container_name: auth-service
     build:
       context: .
       dockerfile: ./app/auth-service/Dockerfile
-      target: development
+      target: production
     ports:
       - "3002:3002"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/app/auth-service/node_modules
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=3002
       - DATABASE_HOST=db
       - DATABASE_PORT=5432
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=password
-      - DATABASE_NAME=challenge_db
-      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
-      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
-      - JWT_EXPIRATION=1d
+      - DATABASE_USER=${DATABASE_USER:-postgres}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME:-challenge_db}
+      - RABBITMQ_URL=${RABBITMQ_URL:-amqp://admin:admin@rabbitmq:5672}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-1d}
     depends_on:
       db:
         condition: service_healthy
@@ -81,29 +71,26 @@ services:
         condition: service_healthy
     networks:
       - challenge-network
+    restart: always
 
   tasks-service:
     container_name: tasks-service
     build:
       context: .
       dockerfile: ./app/tasks-service/Dockerfile
-      target: development
+      target: production
     ports:
       - "3003:3003"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/app/tasks-service/node_modules
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=3003
       - DATABASE_HOST=db
       - DATABASE_PORT=5432
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=password
-      - DATABASE_NAME=challenge_db
-      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
-      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - DATABASE_USER=${DATABASE_USER:-postgres}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME:-challenge_db}
+      - RABBITMQ_URL=${RABBITMQ_URL:-amqp://admin:admin@rabbitmq:5672}
+      - JWT_SECRET=${JWT_SECRET}
     depends_on:
       db:
         condition: service_healthy
@@ -111,28 +98,25 @@ services:
         condition: service_healthy
     networks:
       - challenge-network
+    restart: always
 
   notification-service:
     container_name: notification-service
     build:
       context: .
       dockerfile: ./app/notification-service/Dockerfile
-      target: development
+      target: production
     ports:
       - "3004:3004"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/app/notification-service/node_modules
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=3004
       - DATABASE_HOST=db
       - DATABASE_PORT=5432
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=password
-      - DATABASE_NAME=challenge_db
-      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
+      - DATABASE_USER=${DATABASE_USER:-postgres}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME:-challenge_db}
+      - RABBITMQ_URL=${RABBITMQ_URL:-amqp://admin:admin@rabbitmq:5672}
     depends_on:
       db:
         condition: service_healthy
@@ -140,11 +124,11 @@ services:
         condition: service_healthy
     networks:
       - challenge-network
+    restart: always
 
   db:
     image: postgres:17.5-alpine3.21
     container_name: db
-    attach: false
     ports:
       - "5432:5432"
     networks:
@@ -153,19 +137,19 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: postgres
-      POSTGRES_DB: challenge_db
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_DB: ${DATABASE_NAME:-challenge_db}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d challenge_db"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  # RabbitMQ
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
     container_name: rabbitmq
-    attach: false
     restart: always
     ports:
       - "5672:5672"
@@ -173,8 +157,8 @@ services:
     networks:
       - challenge-network
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-admin}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:

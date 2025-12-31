@@ -14,9 +14,9 @@ RUN apk add --no-cache libc6-compat
 FROM base AS deps
 
 COPY package*.json ./
-COPY app/api-gateway/package*.json ./app/api-gateway/
+COPY app/notification-service/package*.json ./app/notification-service/
 
-RUN npm ci --workspace=api-gateway
+RUN npm ci --workspace=notification-service
 
 # ================================
 # Development Stage
@@ -24,13 +24,13 @@ RUN npm ci --workspace=api-gateway
 FROM base AS development
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/app/api-gateway/node_modules ./app/api-gateway/node_modules
+COPY --from=deps /app/app/notification-service/node_modules ./app/notification-service/node_modules
 
 COPY . .
 
-WORKDIR /app/app/api-gateway
+WORKDIR /app/app/notification-service
 
-EXPOSE 3001
+EXPOSE 3004
 
 CMD ["npm", "run", "dev"]
 
@@ -40,11 +40,11 @@ CMD ["npm", "run", "dev"]
 FROM base AS builder
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/app/api-gateway/node_modules ./app/api-gateway/node_modules
+COPY --from=deps /app/app/notification-service/node_modules ./app/notification-service/node_modules
 
 COPY . .
 
-WORKDIR /app/app/api-gateway
+WORKDIR /app/app/notification-service
 
 RUN npm run build
 
@@ -61,13 +61,13 @@ RUN apk add --no-cache libc6-compat
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nestjs
 
-COPY --from=builder /app/app/api-gateway/dist ./dist
-COPY --from=builder /app/app/api-gateway/package*.json ./
-COPY --from=builder /app/app/api-gateway/node_modules ./node_modules
+COPY --from=builder /app/app/notification-service/dist ./dist
+COPY --from=builder /app/app/notification-service/package*.json ./
+COPY --from=builder /app/app/notification-service/node_modules ./node_modules
 
 USER nestjs
 
-EXPOSE 3001
+EXPOSE 3004
 
 ENV NODE_ENV=production
 
